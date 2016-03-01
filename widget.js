@@ -3229,6 +3229,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             
         },
         getInflatePath: function (paths, delta, joinType) {
+            
+            console.log ("paths:  ", paths);
+            
             var scale = 10000;
             ClipperLib.JS.ScaleUpPaths(paths, scale);
             var miterLimit = 2;
