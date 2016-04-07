@@ -5690,6 +5690,33 @@ EagleCanvas.prototype.parsePad = function (pad) {
 EagleCanvas.prototype.parseWire = function (wire) {
     var width = parseFloat(wire.getAttribute('width'));
     if (width <= 0.0) width = this.minLineWidth;
+    var layerName = this.activeLayer;
+    if (layerName == "Bottom") {
+    return {
+            'x1': parseFloat(wire.getAttribute('x1')*(-1)),
+            'y1': parseFloat(wire.getAttribute('y1')),
+            'x2': parseFloat(wire.getAttribute('x2')*(-1)),
+            'y2': parseFloat(wire.getAttribute('y2')),
+            'width': width,
+            'layer': parseInt(wire.getAttribute('layer'))
+    };
+    }
+    else {
+        return {
+            'x1': parseFloat(wire.getAttribute('x1')),
+            'y1': parseFloat(wire.getAttribute('y1')),
+            'x2': parseFloat(wire.getAttribute('x2')),
+            'y2': parseFloat(wire.getAttribute('y2')),
+            'width': width,
+            'layer': parseInt(wire.getAttribute('layer'))
+    };
+    }
+    }
+
+// ORIG
+/*EagleCanvas.prototype.parseWire = function (wire) {
+    var width = parseFloat(wire.getAttribute('width'));
+    if (width <= 0.0) width = this.minLineWidth;
 
     return {
         'x1': parseFloat(wire.getAttribute('x1')),
@@ -5700,6 +5727,7 @@ EagleCanvas.prototype.parseWire = function (wire) {
             'layer': parseInt(wire.getAttribute('layer'))
     };
 }
+*/
 
 EagleCanvas.prototype.parsePoly = function (poly) {
     var width = parseFloat(poly.getAttribute('width'));
