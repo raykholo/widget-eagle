@@ -251,10 +251,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         id: "com-chilipeppr-widget-eagle",
         name: "Widget / Eagle BRD v4",
         desc: "This widget lets you drag in an Eagle PCB \".brd\" file to mill.",
-        url: "http://raw.githubusercontent.com/chilipeppr/widget-eagle/master/auto-generated-widget.html",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
-        fiddleurl: "http://ide.c9.io/chilipeppr/widget-eagle", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
-        githuburl: "http://github.com/chilipeppr/widget-eagle", // The backing github repo
-        testurl: "http://widget-eagle-chilipeppr.c9users.io/widget.html",   // The standalone working widget so can view it working by itself
+        url: "http://raw.githubusercontent.com/Tegeon/widget-eagle/master/auto-generated-widget.html",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
+        fiddleurl: "http://ide.c9.io/tegeon/widget-eagle", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
+        githuburl: "http://github.com/Tegeon/widget-eagle", // The backing github repo
+        testurl: "http://widget-eagle-tegeon.c9users.io/widget.html",   // The standalone working widget so can view it working by itself
         /**
          * Define pubsub signals below. These are basically ChiliPeppr's event system.
          * ChiliPeppr uses amplify.js's pubsub system so please refer to docs at
@@ -6094,12 +6094,16 @@ EagleCanvas.prototype.mirrorLayer = function (layerIdx) {
                             1 oz = 0.035mm, 2 oz = 0.07mm, 3 oz = 0.105mm thick. If you use ChiliPeppr's Auto-Level, you could safely mill with depths of 1 oz = 0.07mm, 2 oz = 0.1mm (most popular), 3 oz = 0.15mm. That means a V-bit with a 45&deg; angle
                             at 0.1mm depth will have a diameter of roughly 0.1mm. So, you could use 0.05mm above, however, in practice it would be best to inflate further than that to be safe.</p>
                     </div>
+                    
                     Advanced Inflating
+                    <p class="descriptive-text">Instead of using the default inflate value, you can override
+                    inflate values for specific elements on the board.</p>
+                    
                     <div class="panel eagle-advanced" style="margin-bottom:10px;">
 
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" class="use-inflate-smds-by" checked /> Inflate SMDs By
+                                <input type="checkbox" class="use-inflate-smds-by" xchecked /> Inflate SMDs By
                             </label>
                         </div>
                         <div class="input-group">
@@ -6185,14 +6189,6 @@ EagleCanvas.prototype.mirrorLayer = function (layerIdx) {
 
                     <h2 style="margin-top:10px;">Traces</h2> 
                     
-                    Spindle Speed
-                    <div class="input-group">
-                        <input class="form-control spindle-rpm" type="number" placeholder="" value="12000" />
-                        <div class="input-group-addon">rpm</div>
-                    </div>
-                    <p class="descriptive-text">Spindle speed (rpm) value will be used for a whole job. If you need various speeds for different parts of the job e.g. milling traces, drilling, milling board outline, please edit the gcode file manually and replace S12000 with Sxxxx, where xxxx = your new spindle speed value.
-                    </p>
-                    
                     Depth of Milling Traces
                     <div class="input-group">
                         <input class="form-control trace-depth" type="number" placeholder="Depth" value="-0.1" />
@@ -6220,6 +6216,14 @@ EagleCanvas.prototype.mirrorLayer = function (layerIdx) {
                         <div class="input-group-addon">mm/min</div>
                     </div>
                     <p class="descriptive-text">The feedrate to use when the Z is descending into your copper. Default is 30mm/min.
+                    </p>
+                    
+                    Spindle Speed
+                    <div class="input-group">
+                        <input class="form-control spindle-rpm" type="number" placeholder="" value="12000" />
+                        <div class="input-group-addon">rpm</div>
+                    </div>
+                    <p class="descriptive-text">Spindle speed (rpm) value will be used for a whole job. If you need various speeds for different parts of the job e.g. milling traces, drilling, milling board outline, please edit the gcode file manually and replace S12000 with Sxxxx, where xxxx = your new spindle speed value.
                     </p>
 
                     <h2>Clearance Height</h2> Clearance for Z Axis Moves
