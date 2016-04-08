@@ -4375,7 +4375,8 @@ else {
             var that = this;
             
             var bigSceneGroup = new THREE.Group();
-            var layerName = layer.name;
+//            var layerName = layer.name;
+            var layerName = this.activeLayer;
 
             for (var elemKey in this.eagle.elements) {
                 var elem = this.eagle.elements[elemKey];
@@ -4925,6 +4926,12 @@ else {
                     var meshCtr = 0;
 
                     group.children.forEach(function (line) {
+                        
+                        
+                        
+                        
+                        
+                        
                         //console.log("line in group:", line);
                         temparr[lineCtr] = [];
                         var firstMeshPt = null;
@@ -4933,7 +4940,10 @@ else {
 
                         // Get absolute coordinates from drill hole
                         // in an element
-                        if( line.position.x == 0 ){ // only middle point holes
+                        if( line.position.x == 0 ){
+                            
+                        if (layerName == "Bottom") {
+                        // only middle point holes
                            var vector = new THREE.Vector3();
                            vector.setFromMatrixPosition( line.matrixWorld  );
                            // Most exists only drills with diameter 1.0 0.9 0.8 ...
@@ -4949,13 +4959,35 @@ else {
                            // New routine to draw a cirlce in threed
                            //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
                            bigSceneGroup.add (this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
+                           // drill hole --> end
+                        }
+                        else {
+                        // only middle point holes
+                           var vector = new THREE.Vector3();
+                           vector.setFromMatrixPosition( line.matrixWorld  );
+                           // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                           var drill = line.parent.userData.pad.drill;
+                           var shape = line.parent.userData.pad.shape;
+                           if(this.drillPads[drill.toFixed(1)] === undefined)
+                               this.drillPads[drill.toFixed(1)] = [];
+                           this.drillPads[drill.toFixed(1)].push({
+                               X: (vector.x.toFixed(4)),
+                               Y: vector.y.toFixed(4),
+                               D: drill.toFixed(4)
+                           });
+                           // New routine to draw a cirlce in threed
+                           //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
+                           bigSceneGroup.add (this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
 
                            // drill hole --> end
-                         }
+                        }
+                     }
+
+
                         // SEB pads mirroring
                         line.geometry.vertices.forEach(function (v) {
                             
-                            if (layerName == "Top") {
+                            if (layerName == "Bottom") {
                             //console.log("pushing v onto clipper:", v);
                             var vector = v.clone();
                             //vector.applyMatrix( group.matrixWorld );
@@ -4964,16 +4996,16 @@ else {
                               this.clipperElements[elemKey + "-" + lineCtr] = [];
 
                             this.clipperElements[elemKey + "-" + lineCtr].push({
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             });
                             temparr[lineCtr].push({
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             });
                             //elem["threeObj"]["pads"]
                             var ptxy = {
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             };
                             if (line.userData.type == "drill") {
@@ -4995,16 +5027,16 @@ else {
                               this.clipperElements[elemKey + "-" + lineCtr] = [];
 
                             this.clipperElements[elemKey + "-" + lineCtr].push({
-                                X: -vec.x,
+                                X: vec.x,
                                 Y: vec.y
                             });
                             temparr[lineCtr].push({
-                                X: -vec.x,
+                                X: vec.x,
                                 Y: vec.y
                             });
                             //elem["threeObj"]["pads"]
                             var ptxy = {
-                                X: -vec.x,
+                                X: vec.x,
                                 Y: vec.y
                             };
                             if (line.userData.type == "drill") {
@@ -5971,9 +6003,9 @@ EagleCanvas.prototype.parseWire = function (wire) {
     var layerName = this.activeLayer;
     if (layerName == "Bottom") {
     return {
-            'x1': (parseFloat(wire.getAttribute('x1'))*-1),
+            'x1': -(parseFloat(wire.getAttribute('x1'))),
             'y1': parseFloat(wire.getAttribute('y1')),
-            'x2': (parseFloat(wire.getAttribute('x2'))*-1),
+            'x2': -(parseFloat(wire.getAttribute('x2'))),
             'y2': parseFloat(wire.getAttribute('y2')),
             'width': width,
             'layer': parseInt(wire.getAttribute('layer'))
