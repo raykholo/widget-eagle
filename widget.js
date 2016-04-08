@@ -3795,7 +3795,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     line.geometry.vertices.forEach(function(v) {
                         var vector = v.clone();
                         var vec = line.localToWorld(vector);
-                        clipperPath.push({X: vec.x, Y: vec.y});
+                        clipperPath.push({X: -(vec.x), Y: vec.y});
                     }, this);
                     this.clipperVias.push(clipperPath);
                     
