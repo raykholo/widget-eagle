@@ -4831,7 +4831,7 @@ else {
                            });
                            // New routine to draw a cirlce in threed
                            //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
-                           bigSceneGroup.add (this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
+                           bigSceneGroup.add (this.drawCircle(-(vector.x), vector.y, drill / 2, this.colorHole));
 
                            // drill hole --> end
                          }
