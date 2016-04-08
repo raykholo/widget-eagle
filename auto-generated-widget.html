@@ -3985,8 +3985,9 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             var signalArr = [];
             
             var bigSceneGroup = new THREE.Group();
-
-            for (var signalKey in this.eagle.signalItems) {
+            
+if (layerName == "Bottom") {
+                for (var signalKey in this.eagle.signalItems) {
 
                 var signalLayers = this.eagle.signalItems[signalKey],
                     layerItems = signalLayers[layer.number];
@@ -4013,18 +4014,18 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 //var that = this;
 
                 layerWires.forEach(function (wire) {
-                    //console.log("drawing wires. wire:", wire);
+                //console.log("drawing wires. wire:", wire);
+                // use new util function
+                var sol_paths = that.addStrokeCapsToLine(-wire.x1, wire.y1, -wire.x2, wire.y2, wire.width);
+                //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
 
-                    // use new util function
-                    var sol_paths = that.addStrokeCapsToLine(-wire.x1, wire.y1, -wire.x2, wire.y2, wire.width);
-                    //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
-
-                    //console.log("about to add sol_paths to centipede:", sol_paths);
-                    centipede.push(sol_paths[0]);
-                    wire.clipper = sol_paths[0];
-
+                //console.log("about to add sol_paths to centipede:", sol_paths);
+                centipede.push(sol_paths[0]);
+                wire.clipper = sol_paths[0];
                 });
-
+            
+        
+                
                 // merge centipede array of signals into single object
                 // do a union with Clipper.js
                 var sol_paths = this.getUnionOfClipperPaths(centipede);
@@ -4108,6 +4109,131 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 };
 
             }
+}
+else {
+            for (var signalKey in this.eagle.signalItems) {
+
+                var signalLayers = this.eagle.signalItems[signalKey],
+                    layerItems = signalLayers[layer.number];
+                if (!layerItems) {
+                    continue;
+                }
+                //console.log("layerItems:", layerItems);
+                var layerWires = layerItems['wires'] || [];
+                
+                console.log("layerWires:", layerWires);
+                
+                // create mondo storage
+                if (this.clipperBySignalKey[signalKey] === undefined)
+                    this.clipperBySignalKey[signalKey] = {};
+                this.clipperBySignalKey[signalKey].layer = layer;
+                this.clipperBySignalKey[signalKey].wire = {};
+                
+                //var that = this;
+
+                // per signal wire centipede
+                var centipede = [];
+
+                var scale = 10000;
+                //var that = this;
+
+                layerWires.forEach(function (wire) {
+                //console.log("drawing wires. wire:", wire);
+                // use new util function
+                var sol_paths = that.addStrokeCapsToLine(wire.x1, wire.y1, wire.x2, wire.y2, wire.width);
+                //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
+
+                //console.log("about to add sol_paths to centipede:", sol_paths);
+                centipede.push(sol_paths[0]);
+                wire.clipper = sol_paths[0];
+                });
+            
+        
+                
+                // merge centipede array of signals into single object
+                // do a union with Clipper.js
+                var sol_paths = this.getUnionOfClipperPaths(centipede);
+                //this.drawClipperPaths(sol_paths, this.colorSignal, 0.2);
+                
+                // we can get holes in sol_paths. it's rare but if a user created
+                // their board in such a way that they created a circle with their
+                // wires, we get a hole here. that means we need to separate those
+                // out before asking Three.js to draw the shape because it's not smart
+                // enough to look at winding order of the paths like Clipper.js is
+                var sol_pathsOuter = [];
+                var sol_pathsHoles = [];
+                sol_paths.forEach(function(path) {
+                    if (ClipperLib.Clipper.Orientation(path)) {
+                        sol_pathsOuter.push(path);
+                    } else {
+                        sol_pathsHoles.push(path);
+                    }
+                }, this);
+                // debug draw
+                if (sol_pathsHoles.length > 0) {
+                    console.log("Found signal wire path with holes:", sol_pathsHoles, "paths:", sol_pathsOuter, "signalKey:", signalKey);
+                    //this.drawClipperPaths(sol_pathsOuter, 0x0000ff, 0.99, 0);
+                    //this.drawClipperPaths(sol_pathsHoles, 0xff0000, 0.99, 0);
+                }
+                
+                // remove holes from each path even though that's redundant
+                // Three.js seems to handle this ok as when it calculates triangles
+                // it just sees the hole is nowhere near the triangles and moves on
+                var mesh = this.createClipperPathsAsMesh(sol_pathsOuter, this.colorSignal, this.opacitySignal, sol_pathsHoles);
+                // slide signal wire down a tinge on z
+                // to make rendering prettier
+                //mesh.position.set(0, 0, -0.00001);
+                
+                bigSceneGroup.add (mesh);
+
+                // on layers other than top, we have to possibly apply a rotation/flip
+                //debugger;
+                /*
+                if (layer == "Bottom") {
+                    // flip in Y axis
+                    var mS = (new THREE.Matrix4()).identity();
+                    //set -1 to the corresponding axis
+                    mS.elements[0] = -1;
+                    //mS.elements[5] = -1;
+                    //mS.elements[10] = -1;
+
+                    mesh.applyMatrix(mS);
+                }*/
+
+                // FINALLY. AFTER ALL THAT WORK. LETS ACTUALLY SHOW THE DARN USER THE
+                // BEAUTIFUL 3D OBJECTS WE CREATED
+                mesh.position.set(0,0,-0.00001);
+                //this.sceneAdd(mesh);
+                
+                // add userData for intersect
+                mesh.userData.type = "signal";
+                mesh.userData.name = signalKey;
+                //mesh.userData.wire = wire;
+                mesh.userData.signalKey = signalKey;
+                mesh.userData.layerWires = layerWires;
+                mesh.userData.signalLayers = signalLayers;
+                mesh.userData.layerItems = layerItems;
+                mesh.userData.layer = layer;
+                //mesh.computeFaceNormals();
+                //console.log("just added signal mesh to intersectObjects. mesh:", mesh);
+                this.intersectObjects.push(mesh);
+
+                // create record of this union'ed signal wire
+                var ctr = 0;
+                sol_paths.forEach(function (path) {
+                    that.clipperSignalWires[signalKey + "-" + ctr] = path;
+                    ctr++;
+                });
+
+                // add to mondo object
+                this.clipperBySignalKey[signalKey].wire = {
+                    clipper: sol_paths,
+                    wires: layerWires,
+                    threeObj: mesh
+                };
+
+            }
+}
             
             console.log("SignalWires mesh:  ", mesh, "  group:  ", bigSceneGroup);
             var rFlip = (Math.PI / 180) * 180;
