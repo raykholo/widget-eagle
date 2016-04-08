@@ -3455,7 +3455,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: wire.x2,
+                    X: -(wire.x2),
                     Y: wire.y2
                 });
             }
@@ -3486,13 +3486,13 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
 
-                lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
-                lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
+                lineGeo.vertices.push(new THREE.Vector3(-wire.x1, wire.y1, 0));
+                lineGeo.vertices.push(new THREE.Vector3(-wire.x2, wire.y2, 0));
 
             }
             // now close the line by pushing first vertices
             if (wires.length > 0) {
-                lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));
+                lineGeo.vertices.push(new THREE.Vector3(-wires[0].x1, wires[0].y1, 0));
             }
 
             var line = new THREE.Line(lineGeo, lineMat);
