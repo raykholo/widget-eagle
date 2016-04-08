@@ -3573,20 +3573,24 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
 
             // build clipper dimension format
             this.clipperDimension = [];
-            for (var i = 0; i < wires.length; i++) {
-                if (layerName == "Bottom") {
+            
+            
+            if (layerName == "Bottom") {
+                for (var i = 0; i < wires.length; i++) {
                                     var wire = wires[i];
                 //console.log("clipper appending wire:", wire);
                 this.clipperDimension.push({
-                    X: (wire.x2),
+                    X: -(wire.x1),
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: (wire.x1),
+                    X: -(wire.x2),
                     Y: wire.y2
                 });
                 }
+            }
                 else {
+                    for (var i = 0; i < wires.length; i++) {
                                     var wire = wires[i];
                 //console.log("clipper appending wire:", wire);
                 this.clipperDimension.push({
@@ -3594,12 +3598,11 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: wire.x2,
-                    Y: wire.y2
+                    X: wire.x1,
+                    Y: wire.y1
                 });
                 }
-
-            }
+                }
 
             //for (var signalKey in this.eagle.signalItems) {
             //}
