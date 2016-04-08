@@ -3504,8 +3504,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
 
-                lineGeo.vertices.push(new THREE.Vector3((-wire.x1), wire.y1, 0));
-                lineGeo.vertices.push(new THREE.Vector3((-wire.x2), wire.y2, 0));
+                lineGeo.vertices.push(new THREE.Vector3(-(wire.x2), wire.y1, 0));
+                lineGeo.vertices.push(new THREE.Vector3(-(wire.x1), wire.y2, 0));
                 }
                 else {
                 var wire = wires[i];
