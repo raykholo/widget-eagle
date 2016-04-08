@@ -3661,6 +3661,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
         },
         clipperSignalWires: [], // holds clipper formatted paths
         clipperSignalPolys: [], // holds clipper formatted polygons
+
         draw3dVias: function (layersName) {
             if (!layersName) return;
             var that = this;
@@ -3668,6 +3669,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             //console.log("this.signalItems:", this.eagle.signalItems);
             
             var bigSceneGroup = new THREE.Group();
+            var layerName = this.activeLayer;
             
             for (var signalKey in this.eagle.signalItems) {
                 
@@ -3699,6 +3701,115 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 });
 
                 layerVias.forEach(function (via) {
+                    if (layerName == "Top") {
+                    //console.log("generating circle for via:", via);
+
+                    // save all drills for vias                  
+                    // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                    var drill = via.drill.toFixed(1);
+                    if(that.drillVias[drill] === undefined)
+                        that.drillVias[drill] = [];
+                    that.drillVias[drill].push({
+                        X: via.x.toFixed(4),
+                        Y: via.y.toFixed(4),
+                        D: via.drill.toFixed(4)
+                    });
+                    
+                    
+                    var viashape = "round";
+                    if ('shape' in via) viashape = via.shape;
+                    
+                    var radius = via.drill; //(via.drill * 2) / 2;
+                    var segments = 32;
+                    if (viashape == "octagon") segments = 8;
+                    
+                    //maybe add var in front of viaGeo    
+                    viaGeo = new THREE.CircleGeometry(radius, segments);                    
+                    // Remove center vertex
+                    viaGeo.vertices.shift();
+                    //viaGeo.vertices.pop();
+                   
+                    var line = that.drawCircle(via.x, via.y, via.drill/2, that.colorHole);
+                    line.rotateZ(Math.PI / 8);
+                    
+                    bigSceneGroup.add (line);
+                    //this.sceneAdd(line);
+                    
+                    // Create shape with hole
+                    var shape = new THREE.Shape();
+                    
+                    // Add outside circle to via
+                    var ptCtr = 0;
+                    
+                    viaGeo.vertices.forEach(function (pt) {
+                        //console.log("pt on via:", pt);
+                        if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                        else shape.lineTo(pt.x, pt.y);
+                        ptCtr++;
+                    }, this);
+                    //console.log("shape", shape);
+                    //var pt = viaGeo.vertices[0];
+                    //shape.lineTo(pt.X, pt.y);
+                    
+                    // Create hole inside
+                    radius = via.drill / 2;
+                    segments = 32;
+                    
+                    holeGeo = new THREE.CircleGeometry(radius, segments);                    
+                    // Remove center vertex
+                    holeGeo.vertices.shift();
+
+                    var hole = new THREE.Path();
+                    
+                    var ptCtr = 0;
+                    holeGeo.vertices.forEach(function (pt) {
+                        if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                        else hole.lineTo(pt.x, pt.y);
+                        ptCtr++;
+                    }, this);
+                    shape.holes.push(hole);
+                    
+                    // create mesh for the via
+                    var geometry = new THREE.ShapeGeometry( shape );
+                    var mesh = new THREE.Mesh(geometry, viaMat );
+
+                    // move shape to correct position
+                    mesh.position.set(via.x, via.y, 0);
+                    mesh.rotateZ(Math.PI / 8);
+                    
+                    mesh.userData["type"] = "via";
+                    mesh.userData["via"] = via;
+                    mesh.userData["name"] = signalKey;
+                    mesh.userData["layerVias"] = layerVias;
+                    
+                    bigSceneGroup.add (mesh);
+                    // this.sceneAdd(mesh);
+                    
+                    // add that these get detected during
+                    // mouseover
+                    this.intersectObjects.push(mesh);
+
+                    // add to via object
+                    via["threeObj"] = mesh;
+                    
+                    // add clipper path
+                    var clipperPath = [];
+                    line.updateMatrixWorld();
+                    line.geometry.vertices.forEach(function(v) {
+                        var vector = v.clone();
+                        var vec = line.localToWorld(vector);
+                        clipperPath.push({X: -(vec.x), Y: vec.y});
+                    }, this);
+                    this.clipperVias.push(clipperPath);
+                    
+                    // add to mondo object
+                    this.clipperBySignalKey[signalKey].vias.push({
+                        clipper: clipperPath,
+                        via: via,
+                        threeObj: mesh
+                    });    
+                    }
+                    else {
                     //console.log("generating circle for via:", via);
 
                     // save all drills for vias                  
@@ -3805,6 +3916,10 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         via: via,
                         threeObj: mesh
                     });
+                    }
+                    
+                    
+
                     
                 }, this)
                 
@@ -4837,7 +4952,7 @@ else {
 
                            // drill hole --> end
                          }
-                        // SEB pads mirroring X: -vec.x, ...
+                        // SEB pads mirroring
                         line.geometry.vertices.forEach(function (v) {
                             
                             if (layerName == "Top") {
