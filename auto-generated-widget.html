@@ -4970,16 +4970,16 @@ else {
                               this.clipperElements[elemKey + "-" + lineCtr] = [];
 
                             this.clipperElements[elemKey + "-" + lineCtr].push({
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             });
                             temparr[lineCtr].push({
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             });
                             //elem["threeObj"]["pads"]
                             var ptxy = {
-                                X: vec.x,
+                                X: -vec.x,
                                 Y: vec.y
                             };
                             if (line.userData.type == "drill") {
