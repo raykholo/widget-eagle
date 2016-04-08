@@ -3455,7 +3455,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: -(wire.x2),
+                    X: wire.x2,
                     Y: wire.y2
                 });
             }
