@@ -3832,7 +3832,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     if(that.drillVias[drill] === undefined)
                         that.drillVias[drill] = [];
                     that.drillVias[drill].push({
-                        X: -(via.x.toFixed(4)),
+                        X: via.x.toFixed(4),
                         Y: via.y.toFixed(4),
                         D: via.drill.toFixed(4)
                     });
@@ -3896,7 +3896,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     var mesh = new THREE.Mesh(geometry, viaMat );
 
                     // move shape to correct position
-                    mesh.position.set(via.x, via.y, 0);
+                    mesh.position.set(-(via.x), via.y, 0);
                     mesh.rotateZ(Math.PI / 8);
                     
                     mesh.userData["type"] = "via";
@@ -3920,7 +3920,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     line.geometry.vertices.forEach(function(v) {
                         var vector = v.clone();
                         var vec = line.localToWorld(vector);
-                        clipperPath.push({X: (vec.x), Y: vec.y});
+                        clipperPath.push({X: vec.x, Y: vec.y});
                     }, this);
                     this.clipperVias.push(clipperPath);
                     
