@@ -4831,7 +4831,7 @@ else {
                            });
                            // New routine to draw a cirlce in threed
                            //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
-                           bigSceneGroup.add (this.drawCircle(-(vector.x), vector.y, drill / 2, this.colorHole));
+                           bigSceneGroup.add (this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
 
                            // drill hole --> end
                          }
@@ -4916,8 +4916,8 @@ else {
                         //var revArr = sol_paths[0].reverse();
                         sol_paths[0].forEach(function (pt) {
                             //holeGeo.vertices.push(new THREE.Vector3(pt.X, pt.Y, 0));
-                            if (ptCtr == 0) hole.moveTo(pt.X, pt.Y);
-                            else hole.lineTo(pt.X, pt.Y);
+                            if (ptCtr == 0) hole.moveTo(-(pt.X), pt.Y);
+                            else hole.lineTo((-pt.X), pt.Y);
                             ptCtr++;
                         }, this);
                         shape.holes.push(hole);
