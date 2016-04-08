@@ -3469,6 +3469,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
         
         draw3dDimension: function (endmillSize) {
             var that = this;
+            var layerName = this.activeLayer;
             
             console.log("draw3dDimension", this.eagle);
             var wires = this.getDimensionWires();
@@ -3483,16 +3484,31 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             var lineGeo = new THREE.Geometry();
 
             for (var i = 0; i < wires.length; i++) {
+                if (layerName = "Bottom") {
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
 
                 lineGeo.vertices.push(new THREE.Vector3((-wire.x1), wire.y1, 0));
                 lineGeo.vertices.push(new THREE.Vector3((-wire.x2), wire.y2, 0));
+                }
+                else {
+                var wire = wires[i];
+                //console.log("working on wire:", wire);
 
+                lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
+                lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
+                }
             }
+            
+            
             // now close the line by pushing first vertices
             if (wires.length > 0) {
-                lineGeo.vertices.push(new THREE.Vector3(-(wires[0].x1), wires[0].y1, 0));
+                if (layerName = "Bottom") {
+                lineGeo.vertices.push(new THREE.Vector3(-(wires[0].x1), wires[0].y1, 0));                    
+                }
+                else {
+                lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));                    
+                }
             }
 
             var line = new THREE.Line(lineGeo, lineMat);
