@@ -3540,6 +3540,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
         clipperDimension: [], // holds clipper formatted dimension
         getDimensionWires: function () {
             var layerNumber = this.eagle.eagleLayersByName['Dimension'].number;
+            var layerName = this.activeLayer;
 
             // dimension is wires on layer 20
             var wires = [];
@@ -3573,16 +3574,31 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             // build clipper dimension format
             this.clipperDimension = [];
             for (var i = 0; i < wires.length; i++) {
-                var wire = wires[i];
+                if (layerName == "Bottom") {
+                                    var wire = wires[i];
                 //console.log("clipper appending wire:", wire);
                 this.clipperDimension.push({
+                    X: -(wire.x2),
+                    Y: wire.y1
+                });
+                this.clipperDimension.push({
                     X: -(wire.x1),
+                    Y: wire.y2
+                });
+                }
+                else {
+                                    var wire = wires[i];
+                //console.log("clipper appending wire:", wire);
+                this.clipperDimension.push({
+                    X: wire.x1,
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
                     X: wire.x2,
                     Y: wire.y2
                 });
+                }
+
             }
 
             //for (var signalKey in this.eagle.signalItems) {
