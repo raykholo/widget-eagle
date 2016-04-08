@@ -3832,7 +3832,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     if(that.drillVias[drill] === undefined)
                         that.drillVias[drill] = [];
                     that.drillVias[drill].push({
-                        X: via.x.toFixed(4),
+                        X: -(via.x.toFixed(4)),
                         Y: via.y.toFixed(4),
                         D: via.drill.toFixed(4)
                     });
