@@ -3455,11 +3455,11 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                                     var wire = wires[i];
                 //console.log("clipper appending wire:", wire);
                 this.clipperDimension.push({
-                    X: -(wire.x1),
+                    X: (wire.x1),   // SEB -
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: -(wire.x2),
+                    X: (wire.x2), // SEB -
                     Y: wire.y2
                 });
                 }
@@ -3509,8 +3509,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 //console.log("working on wire:", wire);
                 wire.x1 = -(wire.x1)
                 wire.x2 = -(wire.x2)
-                lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
                 lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
+                lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
                 }
             }
                 else {
@@ -3526,7 +3526,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             // now close the line by pushing first vertices
             if (wires.length > 0) {
                 if (layerName == "Bottom") {
-                lineGeo.vertices.push(new THREE.Vector3(-(wires[0].x1), wires[0].y1, 0));                    
+                lineGeo.vertices.push(new THREE.Vector3((wires[0].x1), wires[0].y1, 0));    // SEB -x
                 }
                 else {
                 lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));                    
