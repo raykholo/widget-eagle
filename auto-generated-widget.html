@@ -4016,7 +4016,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     //console.log("drawing wires. wire:", wire);
 
                     // use new util function
-                    var sol_paths = that.addStrokeCapsToLine(wire.x1, wire.y1, wire.x2, wire.y2, wire.width);
+                    var sol_paths = that.addStrokeCapsToLine(-wire.x1, wire.y1, -wire.x2, wire.y2, wire.width);
                     //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
 
                     //console.log("about to add sol_paths to centipede:", sol_paths);
