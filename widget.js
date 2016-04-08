@@ -4825,7 +4825,7 @@ else {
                            if(this.drillPads[drill.toFixed(1)] === undefined)
                                this.drillPads[drill.toFixed(1)] = [];
                            this.drillPads[drill.toFixed(1)].push({
-                               X: (vector.x.toFixed(4)),
+                               X: -(vector.x.toFixed(4)),
                                Y: vector.y.toFixed(4),
                                D: drill.toFixed(4)
                            });
