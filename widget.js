@@ -3500,8 +3500,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             var lineGeo = new THREE.Geometry();
             
             
-            for (var i = 0; i < wires.length; i++) {
-                if (layerName == "Bottom") {
+            if (layerName == "Bottom") {
+                for (var i = 0; i < wires.length; i++) {
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
                 wire.x1 = -(wire.x1)
@@ -3509,10 +3509,11 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
                 lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
                 }
+            }
                 else {
+                for (var i = 0; i < wires.length; i++) {
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
-
                 lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
                 lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
                 }
