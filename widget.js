@@ -4250,6 +4250,7 @@ else {
         clipperVias: [], // subset of elements (vias)
         drillPads: {}, // save all pad drill vectors
         drillVias: {}, // save all via drill vectors
+        
         draw3dElements: function (layer) {
 
             if (!layer) return;
@@ -4259,6 +4260,7 @@ else {
             var that = this;
             
             var bigSceneGroup = new THREE.Group();
+            var layerName = layer.name;
 
             for (var elemKey in this.eagle.elements) {
                 var elem = this.eagle.elements[elemKey];
@@ -4837,6 +4839,8 @@ else {
                          }
                         // SEB pads mirroring X: -vec.x, ...
                         line.geometry.vertices.forEach(function (v) {
+                            
+                            if (layerName == "Top") {
                             //console.log("pushing v onto clipper:", v);
                             var vector = v.clone();
                             //vector.applyMatrix( group.matrixWorld );
@@ -4865,7 +4869,40 @@ else {
                                 meshArr[meshCtr].push(ptxy);
                                 if (firstMeshPt == null) firstMeshPt = ptxy;
                             }
-                        }, this);
+                            }
+                            else
+                            {
+                            //console.log("pushing v onto clipper:", v);
+                            var vector = v.clone();
+                            //vector.applyMatrix( group.matrixWorld );
+                            var vec = line.localToWorld(vector);
+                            if (!(elemKey + "-" + lineCtr in this.clipperElements)) 
+                              this.clipperElements[elemKey + "-" + lineCtr] = [];
+
+                            this.clipperElements[elemKey + "-" + lineCtr].push({
+                                X: -vec.x,
+                                Y: vec.y
+                            });
+                            temparr[lineCtr].push({
+                                X: -vec.x,
+                                Y: vec.y
+                            });
+                            //elem["threeObj"]["pads"]
+                            var ptxy = {
+                                X: -vec.x,
+                                Y: vec.y
+                            };
+                            if (line.userData.type == "drill") {
+
+                                meshHoleArr.push(ptxy);
+                                if (firstMeshHolePt == null) firstMeshHolePt = ptxy;
+                            } else {
+                                meshArr[meshCtr].push(ptxy);
+                                if (firstMeshPt == null) firstMeshPt = ptxy;
+                            }  
+                                
+                            }
+                            }, this);
                         meshCtr++;
                         // close the mesh and the hole
                         //if (firstMeshPt != null) meshArr.push(firstMeshPt);
@@ -4916,8 +4953,8 @@ else {
                         //var revArr = sol_paths[0].reverse();
                         sol_paths[0].forEach(function (pt) {
                             //holeGeo.vertices.push(new THREE.Vector3(pt.X, pt.Y, 0));
-                            if (ptCtr == 0) hole.moveTo(-(pt.X), pt.Y);
-                            else hole.lineTo((-pt.X), pt.Y);
+                            if (ptCtr == 0) hole.moveTo(pt.X, pt.Y);
+                            else hole.lineTo(pt.X, pt.Y);
                             ptCtr++;
                         }, this);
                         shape.holes.push(hole);
