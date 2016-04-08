@@ -3451,11 +3451,11 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 var wire = wires[i];
                 //console.log("clipper appending wire:", wire);
                 this.clipperDimension.push({
-                    X: -wire.x1,
+                    X: -(wire.x1),
                     Y: wire.y1
                 });
                 this.clipperDimension.push({
-                    X: -wire.x2,
+                    X: wire.x2,
                     Y: wire.y2
                 });
             }
@@ -4926,11 +4926,6 @@ else {
                     var meshCtr = 0;
 
                     group.children.forEach(function (line) {
-                        
-                        
-                        
-                        
-                        
                         
                         //console.log("line in group:", line);
                         temparr[lineCtr] = [];
