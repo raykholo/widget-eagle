@@ -3625,7 +3625,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             var lineGeo = new THREE.Geometry();
 
             for (var i = 0; i < wires.length; i++) {
-                if (layerName = "Bottom") {
+                if (layerName == "Bottom") {
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
 
@@ -3644,7 +3644,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             
             // now close the line by pushing first vertices
             if (wires.length > 0) {
-                if (layerName = "Bottom") {
+                if (layerName == "Bottom") {
                 lineGeo.vertices.push(new THREE.Vector3(-(wires[0].x2), wires[0].y1, 0));                    
                 }
                 else {
