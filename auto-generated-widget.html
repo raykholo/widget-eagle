@@ -3631,8 +3631,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 //console.log("working on wire:", wire);
                 wire.x1 = -(wire.x1)
                 wire.x2 = -(wire.x2)
-                lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
                 lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
+                lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
                 }
             }
                 else {
@@ -3648,7 +3648,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             // now close the line by pushing first vertices
             if (wires.length > 0) {
                 if (layerName == "Bottom") {
-                lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));                    
+                lineGeo.vertices.push(new THREE.Vector3(-(wires[0].x2), wires[0].y1, 0));                    
                 }
                 else {
                 lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));                    
