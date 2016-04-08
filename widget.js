@@ -5693,9 +5693,9 @@ EagleCanvas.prototype.parseWire = function (wire) {
     var layerName = this.activeLayer;
     if (layerName == "Bottom") {
     return {
-            'x1': parseFloat(wire.getAttribute('x1')*(-1)),
+            'x1': parseFloat(wire.getAttribute('x1')*-1),
             'y1': parseFloat(wire.getAttribute('y1')),
-            'x2': parseFloat(wire.getAttribute('x2')*(-1)),
+            'x2': parseFloat(wire.getAttribute('x2')*-1),
             'y2': parseFloat(wire.getAttribute('y2')),
             'width': width,
             'layer': parseInt(wire.getAttribute('layer'))
