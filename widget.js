@@ -4825,7 +4825,7 @@ else {
                            if(this.drillPads[drill.toFixed(1)] === undefined)
                                this.drillPads[drill.toFixed(1)] = [];
                            this.drillPads[drill.toFixed(1)].push({
-                               X: vector.x.toFixed(4),
+                               X: (vector.x.toFixed(4)*-1),
                                Y: vector.y.toFixed(4),
                                D: drill.toFixed(4)
                            });
@@ -4835,7 +4835,7 @@ else {
 
                            // drill hole --> end
                          }
-                        
+                        // SEB pads mirroring X: -vec.x, ...
                         line.geometry.vertices.forEach(function (v) {
                             //console.log("pushing v onto clipper:", v);
                             var vector = v.clone();
