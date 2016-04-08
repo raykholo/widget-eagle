@@ -3629,7 +3629,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 if (layerName == "Bottom") {
                 var wire = wires[i];
                 //console.log("working on wire:", wire);
-                wire.x1 = -wire.x1
+                wire.x1 = -(wire.x1)
+                wire.x2 = -(wire.x2)
                 lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
                 lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
                 }
