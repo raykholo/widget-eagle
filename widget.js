@@ -5741,7 +5741,8 @@ EagleCanvas.LayerId = {
     'TOP_DOCUMENTATION': 7,
     'VIAS': 8,
     'OUTLINE': 9,
-    'PADS': 10
+    'PADS': 10,
+    'HOLES': 11
 }
 
 EagleCanvas.LARGE_NUMBER = 99999;
@@ -5763,6 +5764,7 @@ function EagleCanvas(canvasId) {
     this.visibleLayers[EagleCanvas.LayerId.TOP_DOCUMENTATION] = true;
     this.visibleLayers[EagleCanvas.LayerId.VIAS] = true;
     //this.visibleLayers[EagleCanvas.LayerId.PADS]                 = true;
+    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
     this.visibleLayers[EagleCanvas.LayerId.OUTLINE] = true;
 
     this.renderLayerOrder = [];
@@ -5774,6 +5776,7 @@ function EagleCanvas(canvasId) {
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_COPPER);
     this.renderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     //this.renderLayerOrder.push(EagleCanvas.LayerId.PADS);
+    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_SILKSCREEN);
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_DOCUMENTATION);
 
@@ -5785,6 +5788,7 @@ function EagleCanvas(canvasId) {
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.OUTLINE);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_COPPER);
     //this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.PADS);
+    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_SILKSCREEN);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_DOCUMENTATION);
@@ -5834,6 +5838,10 @@ function EagleCanvas(canvasId) {
 
     this.layerRenderFunctions[EagleCanvas.LayerId.PADS] = function(that, ctx) {
         that.drawPads(ctx, '#0b0');
+    }
+    
+    this.layerRenderFunctions[EagleCanvas.LayerId.HOLES] = function(that, ctx) {
+        that.drawElements(that.eagleLayersByName['Holes'], ctx);
     }
 
     this.layerRenderFunctions[EagleCanvas.LayerId.OUTLINE] = function(that, ctx) {
@@ -6041,6 +6049,13 @@ EagleCanvas.prototype.parse = function() {
             var text = texts[textIdx];
             packageTexts.push(this.parseText(text));
         }
+        
+        var packageHoles = [];
+        var holes = pkg.getElementsByTagName('hole');
+        for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
+            var hole = holes[holeIdx];
+            packageHoles.push(this.parseHole(hole));
+        }
 
         var packageDict = {
             'pads': packagePads,
@@ -6048,7 +6063,8 @@ EagleCanvas.prototype.parse = function() {
             'wires': packageWires,
             'texts': packageTexts,
             'bbox': bbox,
-            'name': packageName
+            'name': packageName,
+            'holes': packageHoles
         };
         this.packagesByName[packageName] = packageDict;
     }
@@ -6139,6 +6155,15 @@ EagleCanvas.prototype.parseWire = function(wire) {
             'layer': parseInt(wire.getAttribute('layer'))
         };
     }
+}
+
+EagleCanvas.prototype.parseHole = function(hole) {
+    return {
+        'x': parseFloat(hole.getAttribute('x')),
+        'y': parseFloat(hole.getAttribute('y')),
+        'drill': parseFloat(hole.getAttribute('drill')),
+        'name': hole.getAttribute('name')
+    };
 }
 
 // ORIG
