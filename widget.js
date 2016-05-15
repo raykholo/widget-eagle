@@ -936,6 +936,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             this.draw3dElements(this.eagle.eagleLayersByName[this.activeLayer]);
 
             this.draw3dVias('1-16');
+            this.draw3dHoles('1-46');
             this.threeDimensions = this.draw3dDimension(this.endmillSize);
             //this.obj3d.children = [];
 
