@@ -3760,7 +3760,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             vias: [],
             smds: [],
             pads: [],
-            holes: [],
+            eholes: [],
         },
         clipperSignalWires: [], // holds clipper formatted paths
         clipperSignalPolys: [], // holds clipper formatted polygons
@@ -4083,10 +4083,10 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 // create mondo storage
                 if (this.clipperBySignalKey[signalKey] === undefined)
                     this.clipperBySignalKey[signalKey] = {};
-                this.clipperBySignalKey[signalKey].holes = [];
+                this.clipperBySignalKey[signalKey].eholes = [];
 
                 // create mesh version
-                var viaMat = new THREE.MeshBasicMaterial({
+                var eholeMat = new THREE.MeshBasicMaterial({
                     color: this.colorHole,
                     transparent: true,
                     opacity: this.opacityHole,
@@ -4099,34 +4099,36 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                     opacity: 0.99
                 });
 
-                layerHoles.forEach(function(hole) {
+                layerHoles.forEach(function(ehole) {
                     if (layerName == "Top") {
                         //console.log("generating circle for hole:", hole);
 
                         // save all drills for holes                  
                         // Most exists only drills with diameter 1.0 0.9 0.8 ...
-                        var drill = hole.drill.toFixed(1);
+                        var drill = ehole.drill.toFixed(1);
                         if (that.drillHoles[drill] === undefined)
                             that.drillHoles[drill] = [];
                         that.drillHoles[drill].push({
-                            X: hole.x.toFixed(4),
-                            Y: hole.y.toFixed(4),
-                            D: hole.drill.toFixed(4)
+                            X: ehole.x.toFixed(4),
+                            Y: ehole.y.toFixed(4),
+                            D: ehole.drill.toFixed(4)
                         });
 
 
-                        var holeshape = "round";
+                       // var viashape = "round";
+                        //if ('shape' in via) viashape = via.shape;
 
-                        var radius = hole.drill; //(hole.drill * 2) / 2;
+                        var radius = ehole.drill; //(hole.drill * 2) / 2;
                         var segments = 32;
+                        //if (viashape == "octagon") segments = 8;
 
                         //maybe add var in front of viaGeo    
-                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        eholeGeo = new THREE.CircleGeometry(radius, segments);
                         // Remove center vertex
-                        holeGeo.vertices.shift();
+                        eholeGeo.vertices.shift();
                         //viaGeo.vertices.pop();
 
-                        var line = that.drawCircle(hole.x, hole.y, hole.drill / 2, that.colorHole);
+                        var line = that.drawCircle(ehole.x, ehole.y, ehole.drill / 2, that.colorHole);
                         line.rotateZ(Math.PI / 8);
 
                         bigSceneGroup.add(line);
@@ -4135,21 +4137,21 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         // Create shape with hole
                         var shape = new THREE.Shape();
 
-                        // Add outside circle to hole
+                        // Add outside circle to via
                         var ptCtr = 0;
 
-                        viaGeo.vertices.forEach(function(pt) {
+                        eholeGeo.vertices.forEach(function(pt) {
                             //console.log("pt on hole:", pt);
                             if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
                             else shape.lineTo(pt.x, pt.y);
                             ptCtr++;
                         }, this);
                         //console.log("shape", shape);
-                        //var pt = holeGeo.vertices[0];
+                        //var pt = viaGeo.vertices[0];
                         //shape.lineTo(pt.X, pt.y);
 
                         // Create hole inside
-                        radius = hole.drill / 2;
+                        radius = ehole.drill / 2;
                         segments = 32;
 
                         holeGeo = new THREE.CircleGeometry(radius, segments);
@@ -4168,16 +4170,16 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
 
                         // create mesh for the hole
                         var geometry = new THREE.ShapeGeometry(shape);
-                        var mesh = new THREE.Mesh(geometry, holeMat);
+                        var mesh = new THREE.Mesh(geometry, eholeMat);
 
                         // move shape to correct position
-                        mesh.position.set(hole.x, hole.y, 0);
+                        mesh.position.set(ehole.x, ehole.y, 0);
                         mesh.rotateZ(Math.PI / 8);
 
                         mesh.userData["type"] = "hole";
-                        mesh.userData["hole"] = hole;
+                        mesh.userData["hole"] = ehole;
                         mesh.userData["name"] = signalKey;
-                        mesh.userData["layerHoles"] = layerHoles;
+                        mesh.userData["layerVias"] = layerHoles;
 
                         bigSceneGroup.add(mesh);
                         // this.sceneAdd(mesh);
@@ -4187,7 +4189,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         this.intersectObjects.push(mesh);
 
                         // add to via object
-                        hole["threeObj"] = mesh;
+                        ehole["threeObj"] = mesh;
 
                         // add clipper path
                         var clipperPath = [];
@@ -4203,9 +4205,9 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         this.clipperVias.push(clipperPath);
 
                         // add to mondo object
-                        this.clipperBySignalKey[signalKey].vias.push({
+                        this.clipperBySignalKey[signalKey].eholes.push({
                             clipper: clipperPath,
-                            hole: hole,
+                            ehole: ehole,
                             threeObj: mesh
                         });
                     }
@@ -4342,7 +4344,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             console.groupEnd();
 
         },
-
+        
 // SEB HOLES DRILL END
         
         
@@ -6218,6 +6220,13 @@ EagleCanvas.prototype.parse = function() {
         this.elements[elemDict.name] = elemDict;
     }
 
+    this.eholes = {};
+    var eholes = this.boardXML.getElementsByTagName('hole');
+    for (var eholeIdx = 0; eholeIdx < eholes.length; eholeIdx++) {
+        var eholeDict = this.parseElement(eholes[eholeIdx])
+        this.eholes[eholeDict.name] = eholeDict;
+    }
+
     this.signalItems = {};
     //hashmap signal name -> hashmap layer number -> hashmap 'wires'->wires array, 'vias'->vias array
     var signals = this.boardXML.getElementsByTagName('signal');
@@ -6354,10 +6363,10 @@ EagleCanvas.prototype.parse = function() {
         }
         
         var packageHoles = [];
-        var holes = pkg.getElementsByTagName('hole');
-        for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
-            var hole = holes[holeIdx];
-            packageHoles.push(this.parseHole(hole));
+        var eholes = pkg.getElementsByTagName('hole');
+        for (var eholeIdx = 0; eholeIdx < eholes.length; eholeIdx++) {
+            var ehole = eholes[eholeIdx];
+            packageHoles.push(this.parseHole(ehole));
         }
 
         var packageDict = {
