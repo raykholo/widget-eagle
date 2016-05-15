@@ -1017,6 +1017,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
         opacityDimension: 0.3,
         opacityVia: 0.1,
         opacityPad: 0.1,
+        opacityHole: 0.3,
         endmillSize: 0.0, // size of endmill that user picks
         actualEndmill: 0.2,
         inflateMillPathBy: null,
@@ -3883,6 +3884,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             vias: [],
             smds: [],
             pads: [],
+            holes: [],
         },
         clipperSignalWires: [], // holds clipper formatted paths
         clipperSignalPolys: [], // holds clipper formatted polygons
@@ -4170,6 +4172,306 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             console.groupEnd();
 
         },
+        
+
+
+
+
+
+
+
+
+
+        
+// SEB HOLES DRILL START
+
+        draw3dHoles: function(layersName) {
+            if (!layersName) return;
+            var that = this;
+            console.group("draw3dHoles");
+            //console.log("this.signalItems:", this.eagle.signalItems);
+
+            var bigSceneGroup = new THREE.Group();
+            var layerName = this.activeLayer;
+
+            for (var signalKey in this.eagle.signalItems) {
+
+                var signalLayers = this.eagle.signalItems[signalKey];
+                var layerItems = signalLayers[layersName];
+                if (!layerItems) {
+                    continue;
+                }
+                var layerHoles = layerItems['holes'] || [];
+                //console.log("layerHoles:", layerHoles);
+
+                // create mondo storage
+                if (this.clipperBySignalKey[signalKey] === undefined)
+                    this.clipperBySignalKey[signalKey] = {};
+                this.clipperBySignalKey[signalKey].holes = [];
+
+                // create mesh version
+                var viaMat = new THREE.MeshBasicMaterial({
+                    color: this.colorHole,
+                    transparent: true,
+                    opacity: this.opacityHole,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                var lineMat = new THREE.LineBasicMaterial({
+                    color: this.colorHole,
+                    transparent: true,
+                    opacity: 0.99
+                });
+
+                layerHoles.forEach(function(hole) {
+                    if (layerName == "Top") {
+                        //console.log("generating circle for hole:", hole);
+
+                        // save all drills for holes                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = hole.drill.toFixed(1);
+                        if (that.drillHoles[drill] === undefined)
+                            that.drillHoles[drill] = [];
+                        that.drillHoles[drill].push({
+                            X: hole.x.toFixed(4),
+                            Y: hole.y.toFixed(4),
+                            D: hole.drill.toFixed(4)
+                        });
+
+
+                        var holeshape = "round";
+
+                        var radius = hole.drill; //(hole.drill * 2) / 2;
+                        var segments = 32;
+
+                        //maybe add var in front of viaGeo    
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(hole.x, hole.y, hole.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to hole
+                        var ptCtr = 0;
+
+                        viaGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on hole:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = holeGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = hole.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var hole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                            else hole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(hole);
+
+                        // create mesh for the hole
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, holeMat);
+
+                        // move shape to correct position
+                        mesh.position.set(hole.x, hole.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "hole";
+                        mesh.userData["hole"] = hole;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerHoles"] = layerHoles;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        hole["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: vec.x,
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].vias.push({
+                            clipper: clipperPath,
+                            hole: hole,
+                            threeObj: mesh
+                        });
+                    }
+                    else {
+                        //console.log("generating circle for via:", via);
+
+                        // save all drills for vias                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = via.drill.toFixed(1);
+                        if (that.drillVias[drill] === undefined)
+                            that.drillVias[drill] = [];
+                        that.drillVias[drill].push({
+                            X: -(via.x.toFixed(4)),
+                            Y: via.y.toFixed(4),
+                            D: via.drill.toFixed(4)
+                        });
+
+
+                        var viashape = "round";
+                        if ('shape' in via) viashape = via.shape;
+
+                        var radius = via.drill; //(via.drill * 2) / 2;
+                        var segments = 32;
+                        if (viashape == "octagon") segments = 8;
+
+                        //maybe add var in front of viaGeo    
+                        viaGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        viaGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(via.x, via.y, via.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to via
+                        var ptCtr = 0;
+
+                        viaGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on via:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = viaGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = via.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var hole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                            else hole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(hole);
+
+                        // create mesh for the via
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, viaMat);
+
+                        // move shape to correct position
+                        mesh.position.set(-(via.x), via.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "via";
+                        mesh.userData["via"] = via;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerVias"] = layerVias;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        via["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: -(vec.x),
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].vias.push({
+                            clipper: clipperPath,
+                            via: via,
+                            threeObj: mesh
+                        });
+                    }
+
+
+
+
+                }, this)
+
+            }
+
+            var rFlip = (Math.PI / 180) * 180;
+            var axisFlip = new THREE.Vector3(0, 1, 0);
+            if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
+                console.log("ray: Bottom Flip Vias (loc2)");
+                that.rotateAroundObjectAxis(bigSceneGroup, axisFlip, rFlip);
+                //placeholder for translating object by x or y board length
+            } //vias get flipped
+
+            that.sceneAdd(bigSceneGroup);
+
+            console.log("this.clipperBySignalKey[]:", this.clipperBySignalKey);
+            console.groupEnd();
+
+        },
+
+// SEB HOLES DRILL END
+        
+        
+        
+        
         draw3dSignalWires: function(layer) {
             //debugger;
             if (!layer) {
