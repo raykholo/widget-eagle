@@ -6162,7 +6162,7 @@ EagleCanvas.prototype.parseHole = function(hole) {
         'x': parseFloat(hole.getAttribute('x')),
         'y': parseFloat(hole.getAttribute('y')),
         'drill': parseFloat(hole.getAttribute('drill')),
-        'name': hole.getAttribute('name')
+//        'name': hole.getAttribute('name')
     };
 }
 
