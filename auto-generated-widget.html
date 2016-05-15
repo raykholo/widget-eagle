@@ -3885,7 +3885,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             vias: [],
             smds: [],
             pads: [],
-            eholes: [],
+            holes: [],
         },
         clipperSignalWires: [], // holds clipper formatted paths
         clipperSignalPolys: [], // holds clipper formatted polygons
@@ -4186,7 +4186,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
         
 // SEB HOLES DRILL START
 
-        draw3dHoles: function(layersName) {
+draw3dHoles: function(layersName) {
             if (!layersName) return;
             var that = this;
             console.group("draw3dHoles");
@@ -4208,10 +4208,10 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                 // create mondo storage
                 if (this.clipperBySignalKey[signalKey] === undefined)
                     this.clipperBySignalKey[signalKey] = {};
-                this.clipperBySignalKey[signalKey].eholes = [];
+                this.clipperBySignalKey[signalKey].holes = [];
 
                 // create mesh version
-                var eholeMat = new THREE.MeshBasicMaterial({
+                var holeMat = new THREE.MeshBasicMaterial({
                     color: this.colorHole,
                     transparent: true,
                     opacity: this.opacityHole,
@@ -4240,12 +4240,12 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         });
 
 
-                       // var viashape = "round";
-                        //if ('shape' in via) viashape = via.shape;
+//                        var viashape = "round";
+//                        if ('shape' in via) viashape = via.shape;
 
                         var radius = ehole.drill; //(hole.drill * 2) / 2;
                         var segments = 32;
-                        //if (viashape == "octagon") segments = 8;
+//                        if (viashape == "octagon") segments = 8;
 
                         //maybe add var in front of viaGeo    
                         eholeGeo = new THREE.CircleGeometry(radius, segments);
@@ -4272,11 +4272,11 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                             ptCtr++;
                         }, this);
                         //console.log("shape", shape);
-                        //var pt = viaGeo.vertices[0];
+                        //var pt = holeGeo.vertices[0];
                         //shape.lineTo(pt.X, pt.y);
 
                         // Create hole inside
-                        radius = ehole.drill / 2;
+                        radius = hole.drill / 2;
                         segments = 32;
 
                         holeGeo = new THREE.CircleGeometry(radius, segments);
@@ -4293,9 +4293,9 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         }, this);
                         shape.holes.push(hole);
 
-                        // create mesh for the hole
+                        // create mesh for the via
                         var geometry = new THREE.ShapeGeometry(shape);
-                        var mesh = new THREE.Mesh(geometry, eholeMat);
+                        var mesh = new THREE.Mesh(geometry, holeMat);
 
                         // move shape to correct position
                         mesh.position.set(ehole.x, ehole.y, 0);
@@ -4304,7 +4304,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         mesh.userData["type"] = "hole";
                         mesh.userData["hole"] = ehole;
                         mesh.userData["name"] = signalKey;
-                        mesh.userData["layerVias"] = layerHoles;
+                        mesh.userData["layerHoles"] = layerHoles;
 
                         bigSceneGroup.add(mesh);
                         // this.sceneAdd(mesh);
@@ -4330,7 +4330,7 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         this.clipperVias.push(clipperPath);
 
                         // add to mondo object
-                        this.clipperBySignalKey[signalKey].eholes.push({
+                        this.clipperBySignalKey[signalKey].holes.push({
                             clipper: clipperPath,
                             ehole: ehole,
                             threeObj: mesh
@@ -4394,15 +4394,15 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
                         // Remove center vertex
                         holeGeo.vertices.shift();
 
-                        var hole = new THREE.Path();
+                        var dhole = new THREE.Path();
 
                         var ptCtr = 0;
                         holeGeo.vertices.forEach(function(pt) {
-                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
-                            else hole.lineTo(pt.x, pt.y);
+                            if (ptCtr == 0) dhole.moveTo(pt.x, pt.y);
+                            else dhole.lineTo(pt.x, pt.y);
                             ptCtr++;
                         }, this);
-                        shape.holes.push(hole);
+                        shape.holes.push(dhole);
 
                         // create mesh for the via
                         var geometry = new THREE.ShapeGeometry(shape);
@@ -4469,6 +4469,8 @@ onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){
             console.groupEnd();
 
         },
+
+
         
 // SEB HOLES DRILL END
         
@@ -6345,11 +6347,11 @@ EagleCanvas.prototype.parse = function() {
         this.elements[elemDict.name] = elemDict;
     }
 
-    this.eholes = {};
-    var eholes = this.boardXML.getElementsByTagName('hole');
-    for (var eholeIdx = 0; eholeIdx < eholes.length; eholeIdx++) {
-        var eholeDict = this.parseElement(eholes[eholeIdx])
-        this.eholes[eholeDict.name] = eholeDict;
+    this.holes = {};
+    var holes = this.boardXML.getElementsByTagName('hole');
+    for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
+        var holeDict = this.parseElement(holes[holeIdx])
+        this.holes[holeDict.name] = holeDict;
     }
 
     this.signalItems = {};
@@ -6488,10 +6490,10 @@ EagleCanvas.prototype.parse = function() {
         }
         
         var packageHoles = [];
-        var eholes = pkg.getElementsByTagName('hole');
-        for (var eholeIdx = 0; eholeIdx < eholes.length; eholeIdx++) {
-            var ehole = eholes[eholeIdx];
-            packageHoles.push(this.parseHole(ehole));
+        var holes = pkg.getElementsByTagName('hole');
+        for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
+            var hole = holes[holeIdx];
+            packageHoles.push(this.parseHole(hole));
         }
 
         var packageDict = {
