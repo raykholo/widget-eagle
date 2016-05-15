@@ -6150,8 +6150,7 @@ function EagleCanvas(canvasId) {
     this.layerRenderFunctions[EagleCanvas.LayerId.HOLES] = function(that, ctx) {
         that.drawElements(that.eagleLayersByName['Holes'], ctx);
         that.drawSignalWires(that.eagleLayersByName['Holes'], ctx);
-        that.drawPads(ctx, '#0b0');
-        that.drawPlainWires(that.eagleLayersByName['Dimension'], ctx);
+        that.drawPlainWires(that.eagleLayersByName['Holes'], ctx);
     }
 
     this.layerRenderFunctions[EagleCanvas.LayerId.OUTLINE] = function(that, ctx) {
