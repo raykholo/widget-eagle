@@ -5776,7 +5776,7 @@ function EagleCanvas(canvasId) {
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_COPPER);
     this.renderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     //this.renderLayerOrder.push(EagleCanvas.LayerId.PADS);
-    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
+    this.renderLayerOrder.push(EagleCanvas.LayerId.HOLES);
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_SILKSCREEN);
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_DOCUMENTATION);
 
@@ -5788,7 +5788,7 @@ function EagleCanvas(canvasId) {
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.OUTLINE);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_COPPER);
     //this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.PADS);
-    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
+    this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.HOLES);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_SILKSCREEN);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_DOCUMENTATION);
