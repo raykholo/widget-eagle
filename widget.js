@@ -1,5 +1,5 @@
-/*global requirejs cprequire cpdefine chilipeppr THREE*/
-// ignore this errormessage:
+/* global requirejs cprequire cpdefine chilipeppr THREE */
+// Defining the globals above helps Cloud9 not show warnings for those variables
 
 // ChiliPeppr Widget/Element Javascript
 
@@ -23,23 +23,23 @@ requirejs.config({
     https://i2dcui.appspot.com which is the SSL equivalent for
     http://chilipeppr.com
     */
-   paths: {
-       // Don't put .js at end of URL (except when passing thru CP geturl proxy)
+    paths: {
+        // Don't put .js at end of URL (except when passing thru CP geturl proxy)
         Three: '//i2dcui.appspot.com/geturl?url=http://threejs.org/build/three.min.js',
         ThreeTextGeometry: '//i2dcui.appspot.com/js/three/TextGeometry',
         ThreeFontUtils: '//i2dcui.appspot.com/js/three/FontUtils',
         ThreeHelvetiker: '//i2dcui.appspot.com/js/three/threehelvetiker',
         Clipper: '//i2dcui.appspot.com/js/clipper/clipper_unminified'
-   },
-   shim: {
-       ThreeTextGeometry: ['Three'],
-       ThreeFontUtils: ['Three', 'ThreeTextGeometry'],
-       ThreeHelvetiker: ['Three', 'ThreeTextGeometry', 'ThreeFontUtils'],
-   }
+    },
+    shim: {
+        ThreeTextGeometry: ['Three'],
+        ThreeFontUtils: ['Three', 'ThreeTextGeometry'],
+        ThreeHelvetiker: ['Three', 'ThreeTextGeometry', 'ThreeFontUtils'],
+    }
 });
 
 // Test this element. This code is auto-removed by the chilipeppr.load()
-cprequire_test(["inline:com-chilipeppr-widget-eagle"], function (ew) {
+cprequire_test(["inline:com-chilipeppr-widget-eagle"], function(ew) {
 
     // Test this element. This code is auto-removed by the chilipeppr.load()
     // when using this widget in production. So use the cpquire_test to do things
@@ -51,66 +51,85 @@ cprequire_test(["inline:com-chilipeppr-widget-eagle"], function (ew) {
 
     $('#com-chilipeppr-widget-eagle').css('position', 'relative');
     $('#com-chilipeppr-widget-eagle').css('background', 'none');
-    $('#com-chilipeppr-widget-eagle').css('width', '300px');
+    $('#com-chilipeppr-widget-eagle').css('width', '320px');
     $('body').prepend('<div id="3dviewer"></div>');
 
-    chilipeppr.load("#3dviewer", "http://fiddle.jshell.net/chilipeppr/y3HRF/195/show/light/", function () {
-        cprequire(['inline:com-chilipeppr-widget-3dviewer'], function (threed) {
-            threed.init({
-                doMyOwnDragDrop: false
-            });
-            //$('#com-chilipeppr-widget-3dviewer .panel-heading').addClass('hidden');
-            //autolevel.addRegionTo3d();
-            //autolevel.loadFileFromLocalStorageKey('com-chilipeppr-widget-autolevel-recent8');
-            //autolevel.toggleShowMatrix();
+    //chilipeppr.load("#3dviewer", "http://fiddle.jshell.net/chilipeppr/y3HRF/195/show/light/", function () {
+    chilipeppr.load(
+        "#3dviewer",
+        "http://raw.githubusercontent.com/chilipeppr/widget-3dviewer/master/auto-generated-widget.html",
+        function() {
+            cprequire(['inline:com-chilipeppr-widget-3dviewer'], function(threed) {
+                threed.init({
+                    doMyOwnDragDrop: false
+                });
+                //$('#com-chilipeppr-widget-3dviewer .panel-heading').addClass('hidden');
+                //autolevel.addRegionTo3d();
+                //autolevel.loadFileFromLocalStorageKey('com-chilipeppr-widget-autolevel-recent8');
+                //autolevel.toggleShowMatrix();
 
-            // only init eagle widget once 3d is loaded
-            // set doMyOwnDragDrop
-            ew.init(true);
+                // only init eagle widget once 3d is loaded
+                // set doMyOwnDragDrop
+                ew.init(true);
+            });
         });
-    });
 
     $('body').prepend('<div id="test-drag-drop"></div>');
     chilipeppr.load("#test-drag-drop", "http://fiddle.jshell.net/chilipeppr/Z9F6G/show/light/",
 
-    function () {
-        cprequire(
-        ["inline:com-chilipeppr-elem-dragdrop"],
+        function() {
+            cprequire(
+                ["inline:com-chilipeppr-elem-dragdrop"],
 
-        function (dd) {
-            dd.init();
-            dd.bind("body", null);
+                function(dd) {
+                    dd.init();
+                    dd.bind("body", null);
+                });
         });
-    });
-    
+
     $('body').prepend('<div id="com-chilipeppr-flash"></div>');
     chilipeppr.load("#com-chilipeppr-flash",
         "http://fiddle.jshell.net/chilipeppr/90698kax/show/light/",
 
-    function () {
-        console.log("mycallback got called after loading flash msg module");
-        cprequire(["inline:com-chilipeppr-elem-flashmsg"], function (fm) {
-            //console.log("inside require of " + fm.id);
-            fm.init();
+        function() {
+            console.log("mycallback got called after loading flash msg module");
+            cprequire(["inline:com-chilipeppr-elem-flashmsg"], function(fm) {
+                //console.log("inside require of " + fm.id);
+                fm.init();
+            });
         });
+
+    // test before and after render
+    chilipeppr.subscribe("/" + ew.id + '/beforeToolPathRender', this, function(eagleWidget) {
+        console.log("publish test. got the /beforeToolPathRender signal. eagleWidget:", eagleWidget);
+    });
+    chilipeppr.subscribe("/" + ew.id + '/afterToolPathRender', this, function(eagleWidget) {
+        console.log("publish test. got the /afterToolPathRender signal. eagleWidget:", eagleWidget);
+    });
+    // test before and after render
+    chilipeppr.subscribe("/" + ew.id + '/beforeLayerGenerate', this, function(eagleWidget) {
+        console.log("publish test. got the /beforeLayerGenerate signal. layer:", eagleWidget.activeLayer, "eagleWidget:", eagleWidget);
+    });
+    chilipeppr.subscribe("/" + ew.id + '/afterLayerGenerate', this, function(eagleWidget) {
+        console.log("publish test. got the /afterLayerGenerate signal. layer:", eagleWidget.activeLayer, "eagleWidget:", eagleWidget);
     });
 
 
 } /*end_test*/ );
 
 // This is the main definition of your widget. Give it a unique name.
-cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "jqueryuiWidget"], function () {
+cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "jqueryuiWidget"], function() {
     return {
         /**
          * The ID of the widget. You must define this and make it unique.
          */
         id: "com-chilipeppr-widget-eagle",
-        name: "Widget / Eagle PCB v3",
+        name: "Widget / Eagle BRD v4",
         desc: "This widget lets you drag in an Eagle PCB \".brd\" file to mill.",
-        url: "(auto fill by runme.js)",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
+        url: "(auto fill by runme.js)", // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
         fiddleurl: "(auto fill by runme.js)", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
         githuburl: "(auto fill by runme.js)", // The backing github repo
-        testurl: "(auto fill by runme.js)",   // The standalone working widget so can view it working by itself
+        testurl: "(auto fill by runme.js)", // The standalone working widget so can view it working by itself
         /**
          * Define pubsub signals below. These are basically ChiliPeppr's event system.
          * ChiliPeppr uses amplify.js's pubsub system so please refer to docs at
@@ -122,27 +141,67 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
          */
         publish: {
             // Define a key:value pair here as strings to document what signals you publish.
-            '/onAddGcode': 'This signal lets a 3rd party add-on inject its own Gcode into the \
-            overall final Gcode for the Eagle BRD Widget. Here is an example of how to subscribe. \
-            \
-            chilipeppr.subscribe("/com-chilipeppr-widget-eagle/addGcode", this, this.myOnAddGcode); \
-            \
-            Then, your callback would look like this with 4 parameters receiving the variables \
-            that the addGcode publish signal sends you. \
-            \
-            onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){ \
-                console.log("Got onAddGcode:", arguments); \
-                // this method calls back to the main Eagle widget to inject our Gcode \
-                addGcodeCallback(1500, myOwnGcode ); \
-            } \
-            \
-            The 1500 in the example above is to attach a priority to where our Gcode will get positioned. \
-            The base Gcode ends around line 900. The footer starts at line 2000. So putting our Gcode at \
-            the end but before the footer means using 1500 should do fine. You can analyze the existing \
-            Gcode by looking at parameter 2 gcodeParts to see if an index has already been used so you \
-            don\'t clobber it. If you want to delete Gcode from gcodeParts you could do that as well and \
-            the main widget will reflect the deletion. \
-            '
+            '/onAddGcode': `This signal lets a 3rd party add-on inject its own Gcode into the 
+            overall final Gcode for the Eagle BRD Widget. Here is an example of how to subscribe. 
+
+<pre>
+chilipeppr.subscribe(
+    "/com-chilipeppr-widget-eagle/addGcode", 
+    this, 
+    this.myOnAddGcode
+    );
+</pre>
+
+            Then, your callback would look like this with 4 parameters receiving the variables 
+            that the addGcode publish signal sends you. 
+
+<pre>
+onAddGcode : function(addGcodeCallback, gcodeParts, eagleWidget, helpDesc){ 
+    console.log("Got onAddGcode:", arguments); 
+    // this method calls back to the main Eagle widget to inject our Gcode 
+    addGcodeCallback(1500, myOwnGcode ); 
+} 
+</pre>
+
+            The 1500 in the example above is to attach a priority to where our Gcode will get positioned. 
+            The base Gcode ends around line 900. The footer starts at line 2000. So putting our Gcode at 
+            the end but before the footer means using 1500 should do fine. You can analyze the existing 
+            Gcode by looking at parameter 2 gcodeParts to see if an index has already been used so you 
+            don't clobber it. If you want to delete Gcode from gcodeParts you could do that as well and 
+            the main widget will reflect the deletion. 
+            `,
+            '/beforeLayerGenerate': `This widget fires a signal before generating the Three.js objects
+                and Clipper paths for a board layer. The Three.js objects are 3D objects representing the
+                pads, vias, smds, wires, polygons, and dimensions. Those Three.js objects are used to
+                populate the 3D viewer and to calculate 2D Clipper paths from. 
+                
+                Clipper paths are the 2D XY
+                values of all the layer's objects and are generated so that unions and diffs can be
+                calculated on those paths in the render step. Clipper paths can be easily inflated and
+                deflated by the Clipper.js library which is why they are so important to this widget.
+                
+                When you get this signal a reference to "this", i.e. the Eagle Widget, is included in
+                the payload so you may use it to manipulate this widget as you see fit.`,
+            '/afterLayerGenerate': `Please see the /beforeLayerGenerate description to understand this
+                signal better. The /afterLayerGenerate signal is fired after this widget is done
+                generating the board layer. The payload is the same as the before signal.`,
+            '/beforeToolPathRender': `This widget fires a signal before the rendering of the tool path 
+                for the milling of the Eagle BRD. As the user tests out different inflate values, you 
+                will get this signal for each re-render of the tool path the user asks for, i.e. when 
+                they click the "render" button.
+                
+                In the payload is a reference to "this" so you can possibly grab info or do other 
+                manipulations of the board before we render the tool path. This is especially useful for add-on 
+                widgets to the Eagle BRD widget such as the Solder Paste Dispenser Add-On or the
+                Pick and Place Add-On.
+                `,
+            '/afterToolPathRender': `This widget fires a signal after the rendering of the tool path 
+                for the Eagle BRD. The tool path is the blue line in the 3D viewer.
+                Similar to the /beforeToolPathRender signal, in the payload is a reference to "this" so you can possibly grab info or do other 
+                manipulations of the board after we render. This is especially useful for add-on 
+                widgets to the Eagle BRD widget such as the Solder Paste Dispenser Add-On or the
+                Pick and Place Add-On.
+                `
         },
         /**
          * Define the subscribe signals that this widget/element owns or defines so that
@@ -175,23 +234,24 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
          * All widgets should have an init method. It should be run by the
          * instantiating code like a workspace or a different widget.
          */
-        init: function (doMyOwnDragDrop) {
+        init: function(doMyOwnDragDrop) {
             // the workspace may want to handle the drag drop
             // but when in dev mode it makes sense for us to do our own
             if (doMyOwnDragDrop) {
                 this.setupDragDrop();
-            } else {
+            }
+            else {
                 // the workspace is doing the drag/drop. this is important
                 // because this code base for this widget is huge and thus
                 // the workspace should handle dragging in BRD files
                 // and once it sees one, it should then load this widget
                 // so that users who don't use ChiliPeppr for BRD files
                 // don't have to load all this insane code
-                
+
             }
-            
-            this.setupFrequentThreeFeatures();  //global definition of frequently used Three features
-            
+
+            this.setupFrequentThreeFeatures(); //global definition of frequently used Three features
+
             this.setupUiFromLocalStorage();
 
             this.btnSetup();
@@ -208,85 +268,85 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.init3d();
 
             this.setupMouseOver();
-            
+
             this.setupAdvancedInflateByUI();
-            
+
             this.setupGcodeTab();
             this.setupFeedsDepths();
-            
+
             // setup clear button
             $('#com-chilipeppr-widget-eagle .btn-clear').click(this.clearEagleBrd.bind(this));
-            
-            
+
+
             this.setupLayerToggleDropdown();
-            
+
             this.setupBoardMirrorCheckboxes();
-            
+
 
             console.log(this.name + " done loading.");
         },
         setupBoardMirrorCheckboxes: function() {
             $('#com-chilipeppr-widget-eagle .mirrorLayerY').change(this.onChangeMirrorLayerYCheckbox.bind(this));
-            $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop ("checked", false);
-            
+            $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop("checked", false);
+
         },
         onChangeMirrorLayerYCheckbox: function() {
-            this.flipTheBoard = $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop ("checked");
-            
+            this.flipTheBoard = $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop("checked");
+
             //console.log ("Flip Bottom Layer About Y Axis: " + $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop ("checked") );
-            console.log ("Flip Bottom Layer About Y Axis: " + this.flipTheBoard );
-            
+            console.log("Flip Bottom Layer About Y Axis: " + this.flipTheBoard);
+
             this.clearEagleBrd();
             this.draw3d();
-            
+
         },
-        
-        
+
+
         setupLayerToggleDropdown: function() {
-        	$('#com-chilipeppr-widget-eagle .selectLayer').change(this.onChangeLayerToggleDropdown.bind(this));
-          //console.log("r0:  ");
+            $('#com-chilipeppr-widget-eagle .selectLayer').change(this.onChangeLayerToggleDropdown.bind(this));
+            //console.log("r0:  ");
         },
-        populateLayerToggleDropdown: function(){
-        	var selectLayerDropdown = $('#com-chilipeppr-widget-eagle .selectLayer');
-          var actionableLayers = [];
-          //var allSignals = Object.keys(this.eagle.signalItems);
-          var allSignals = this.eagle.signalItems;
-          console.log ("allSignals:  ", allSignals);
-          //alert(allSignals[0]);
-          
-          for (var signalKey in this.eagle.signalItems) {
-          	var signalLayers = this.eagle.signalItems[signalKey];
-            var sigKey = Object.keys(signalLayers);
-            
-            for (var i=0; i<sigKey.length; i++) {
-            var sigKeyAsInt = sigKey[i];
-    				console.log ("r2:  ", signalLayers, "keys:", sigKey, "int:  ", sigKeyAsInt);
-            if (sigKeyAsInt > 0 && sigKeyAsInt <= 16) {  //brd layer is 1-16
-            	actionableLayers[sigKeyAsInt-1] = true;		 //-1 for array index
-              console.log ("layer true:  ", sigKeyAsInt);
+        populateLayerToggleDropdown: function() {
+            var selectLayerDropdown = $('#com-chilipeppr-widget-eagle .selectLayer');
+            var actionableLayers = [];
+            //var allSignals = Object.keys(this.eagle.signalItems);
+            var allSignals = this.eagle.signalItems;
+            console.log("allSignals:  ", allSignals);
+            //alert(allSignals[0]);
+
+            for (var signalKey in this.eagle.signalItems) {
+                var signalLayers = this.eagle.signalItems[signalKey];
+                var sigKey = Object.keys(signalLayers);
+
+                for (var i = 0; i < sigKey.length; i++) {
+                    var sigKeyAsInt = sigKey[i];
+                    console.log("r2:  ", signalLayers, "keys:", sigKey, "int:  ", sigKeyAsInt);
+                    if (sigKeyAsInt > 0 && sigKeyAsInt <= 16) { //brd layer is 1-16
+                        actionableLayers[sigKeyAsInt - 1] = true; //-1 for array index
+                        console.log("layer true:  ", sigKeyAsInt);
+                    }
+                    else {
+                        actionableLayers[sigKeyAsInt - 1] = false;
+                        console.log("layer false:  ", sigKeyAsInt);
+                    }
+                }
+            } //this function returns the layer # of each signal!!!
+            selectLayerDropdown.empty();
+            for (i = 0; i < 16; i++) {
+                var loopingLayer = i + 1; //brd layer # is 1 greater than index
+                if (actionableLayers[i] == true) {
+                    selectLayerDropdown.append($("<option />").text(this.eagle.layersByNumber[loopingLayer].name));
+
+                    console.log("r3:  sent layer to dropdown:", this.eagle.layersByNumber[loopingLayer].name);
+                }
+                console.log("r3.5:  activeLayer:", this.activeLayer);
+                selectLayerDropdown.val(this.activeLayer);
+
+
             }
-            else {
-            	actionableLayers[sigKeyAsInt-1] = false;
-              console.log ("layer false:  ", sigKeyAsInt);
-            }
-            }
-          }   //this function returns the layer # of each signal!!!
-          selectLayerDropdown.empty();
-          for (i = 0; i < 16; i++) {
-          	var loopingLayer = i+1; //brd layer # is 1 greater than index
-            if (actionableLayers[i] == true) {
-            	selectLayerDropdown.append($("<option />").text(this.eagle.layersByNumber[loopingLayer].name));
-              
-            console.log ("r3:  sent layer to dropdown:", this.eagle.layersByNumber[loopingLayer].name);
-            }
-            console.log("r3.5:  activeLayer:", this.activeLayer);
-            selectLayerDropdown.val(this.activeLayer);
-            
-          	
-          }
         },
         onChangeLayerToggleDropdown: function() {
-            
+
             var that = this;
 
             var selectedLayerInDropdown = $("#com-chilipeppr-widget-eagle .selectLayer :selected").text();
@@ -320,68 +380,72 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     that.colorSignal = 11403055;
                     that.colorSmd = 11403055;
                 }
-                
-                $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop ("checked", false);
+
+                $('#com-chilipeppr-widget-eagle .mirrorLayerY').prop("checked", false);
                 this.flipTheBoard = false;
 
                 this.clearEagleBrd();
                 this.draw3d();
                 //this.onRefresh();
-          }
-          //console.log("r5.5:  active before", oldActiveLayer);
-          //this.activeLayer=selectedLayerInDropdown;
-          //console.log("r6:  active now", this.activeLayer);
-          //console.log("r7:  layer.name", this.layer.name);
-          //this.onRefresh();
-          
-        /*
-        	var selectLayerDropdown = $('#com-chilipeppr-widget-eagle .selectLayer');
-          //var activeLayer= 'Top';  //Set as property around line 610, ignore this
-          selectLayerDropdown.change(function(){  //Just onchange for now
-          //$('#dropDownId :selected').text();	//Still need to write this jq to get dropdown selected text
-          	this.activeLayer = 'Bottom';			//Will set to selected contents of dropdown
-            console.log("r4:  ActiveLayer:  ", this.activeLayer); 	//this gets logged successfully
-          	this.onRefresh();				//console says this is not a function.				
-            
-          });
-          */
+            }
+            //console.log("r5.5:  active before", oldActiveLayer);
+            //this.activeLayer=selectedLayerInDropdown;
+            //console.log("r6:  active now", this.activeLayer);
+            //console.log("r7:  layer.name", this.layer.name);
+            //this.onRefresh();
+
+            /*
+            	var selectLayerDropdown = $('#com-chilipeppr-widget-eagle .selectLayer');
+              //var activeLayer= 'Top';  //Set as property around line 610, ignore this
+              selectLayerDropdown.change(function(){  //Just onchange for now
+              //$('#dropDownId :selected').text();	//Still need to write this jq to get dropdown selected text
+              	this.activeLayer = 'Bottom';			//Will set to selected contents of dropdown
+                console.log("r4:  ActiveLayer:  ", this.activeLayer); 	//this gets logged successfully
+              	this.onRefresh();				//console says this is not a function.				
+                
+              });
+              */
         },
         flipTheBoard: false, //ray temporary hardcode, later bind to user input
         //placeholder, also need to hold which direction to flip board in.  coming soon.
         boardFlipAxis: null,
-        
+
         //defining Three features we frequently utilize.  No need to redefine constantly.  
-        
+
         ThreeAxisX: null,
         ThreeAxisY: null,
         ThreeAxisZ: null,
-        
+
         deg180toRad: null,
-        
+
         //function to setup these properties.  Call this during init.
-        setupFrequentThreeFeatures: function () {
-            
+        setupFrequentThreeFeatures: function() {
+
             if (!this.ThreeAxisX)
-                this. ThreeAxisX = new THREE.Vector3(1, 0, 0);
-                
+                this.ThreeAxisX = new THREE.Vector3(1, 0, 0);
+
             if (!this.ThreeAxisY)
-                this. ThreeAxisY = new THREE.Vector3(0, 1, 0);
-                
+                this.ThreeAxisY = new THREE.Vector3(0, 1, 0);
+
             if (!this.ThreeAxisZ)
-                this. ThreeAxisZ = new THREE.Vector3(0, 0, 1);
-                
-            
+                this.ThreeAxisZ = new THREE.Vector3(0, 0, 1);
+
+
             if (!this.deg180toRad)
-                this. deg180toRad = (Math.PI / 180) * 180;
-            
+                this.deg180toRad = (Math.PI / 180) * 180;
+
             if (!this.boardFlipAxis)
-                this. boardFlipAxis = this.ThreeAxisY;
+                this.boardFlipAxis = this.ThreeAxisY;
         },
-        
+
         setupFeedsDepths: function() {
             // As user changes vals, just update our global props
             var el = $('#com-chilipeppr-widget-eagle');
             var that = this;
+            el.find('.spindle-rpm').change(function(evt) {
+                console.log("evt:", evt);
+                that.spindleRPM = evt.currentTarget.valueAsNumber;
+            });
             el.find('.trace-depth').change(function(evt) {
                 console.log("evt:", evt);
                 that.depthOfSignalMilling = evt.currentTarget.valueAsNumber;
@@ -401,18 +465,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             });
             el.find('.drill-feedrate').change(function(evt) {
                 console.log("evt:", evt);
-                if(evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
-                  that.drillFeedrate = evt.currentTarget.valueAsNumber;
+                if (evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
+                    that.drillFeedrate = evt.currentTarget.valueAsNumber;
             });
             el.find('.drill-max').change(function(evt) {
                 console.log("evt:", evt);
-                if(evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
-                  that.drillMaxDiameter = evt.currentTarget.valueAsNumber;
+                if (evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
+                    that.drillMaxDiameter = evt.currentTarget.valueAsNumber;
             });
             el.find('.drill-depth').change(function(evt) {
                 console.log("evt:", evt);
-                if(evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
-                  that.drillDepth = evt.currentTarget.valueAsNumber;
+                if (evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
+                    that.drillDepth = evt.currentTarget.valueAsNumber;
             });
             el.find('.dimension-mill-diameter').change(function(evt) {
                 console.log("evt:", evt);
@@ -428,22 +492,22 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 Send user a message and prevent a change here
                 */
                 var choosedDiameter = evt.currentTarget.valueAsNumber;
-                for ( var diameter in that.sortObjByKey(that.drillPads) ){
-                  if(diameter > that.drillMaxDiameter && diameter < choosedDiameter){
-                     evt.currentTarget.style.color = "#ff0000";
-                     chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", 
-                           "Warning", 
-                           "The choosed mill diameter " + choosedDiameter + "mm are to small to mill holes with " 
-                              + diameter + "mm! Please check you drill max diameter!" , 
-                        3 * 1000);
-                      return;
-                  } else {
-                      evt.currentTarget.style.color = ""
-                  }
+                for (var diameter in that.sortObjByKey(that.drillPads)) {
+                    if (diameter > that.drillMaxDiameter && diameter < choosedDiameter) {
+                        evt.currentTarget.style.color = "#ff0000";
+                        chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg",
+                            "Warning",
+                            "The choosed mill diameter " + choosedDiameter + "mm are to small to mill holes with " + diameter + "mm! Please check you drill max diameter!",
+                            3 * 1000);
+                        return;
+                    }
+                    else {
+                        evt.currentTarget.style.color = ""
+                    }
                 }
 
-                if(evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
-                  that.millDiameter = evt.currentTarget.valueAsNumber;
+                if (evt.currentTarget.valueAsNumber) // arrow buttons send 2 events
+                    that.millDiameter = evt.currentTarget.valueAsNumber;
             });
             el.find('.dimension-depth').keyup(function(evt) {
                 console.log("evt:", evt);
@@ -524,55 +588,58 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         /**
          * Try to get a reference to the 3D viewer.
          */
-        init3d: function () {
+        init3d: function() {
             this.get3dObj();
             if (this.obj3d == null) {
                 console.log("loading 3d scene failed, try again in 1 second");
                 var attempts = 1;
                 var that = this;
-                setTimeout(function () {
+                setTimeout(function() {
                     that.get3dObj();
                     if (that.obj3d == null) {
                         attempts++;
-                        setTimeout(function () {
+                        setTimeout(function() {
                             that.get3dObj();
                             if (that.obj3d == null) {
                                 console.log("giving up on trying to get 3d");
-                            } else {
+                            }
+                            else {
                                 console.log("succeeded on getting 3d after attempts:", attempts);
                                 that.onInit3dSuccess();
                             }
                         }, 5000);
-                    } else {
+                    }
+                    else {
                         console.log("succeeded on getting 3d after attempts:", attempts);
                         that.onInit3dSuccess();
                     }
                 }, 1000);
-            } else {
+            }
+            else {
                 this.onInit3dSuccess();
             }
 
         },
-        onInit3dSuccess: function () {
+        onInit3dSuccess: function() {
             console.log("onInit3dSuccess. That means we finally got an object back.");
             this.clear3dViewer();
-            
+
             // open the last file
             var that = this;
             //setTimeout(function () {
-                that.open();
+            that.open();
             //}, 1000);
         },
         obj3d: null, // gets the 3dviewer obj stored in here on callback
         obj3dmeta: null, // gets metadata for 3dviewer
         userCallbackForGet3dObj: null,
-        get3dObj: function (callback) {
+        get3dObj: function(callback) {
             this.userCallbackForGet3dObj = callback;
             chilipeppr.subscribe("/com-chilipeppr-widget-3dviewer/recv3dObject", this, this.get3dObjCallback);
             chilipeppr.publish("/com-chilipeppr-widget-3dviewer/request3dObject", "");
             chilipeppr.unsubscribe("/com-chilipeppr-widget-3dviewer/recv3dObject", this.get3dObjCallback);
         },
-        get3dObjCallback: function (data, meta) {
+        get3dObjCallback: function(data, meta) {
             console.log("got 3d obj:", data, meta);
             this.obj3d = data;
             this.obj3dmeta = meta;
@@ -584,7 +651,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
         },
         is3dViewerReady: false,
-        clear3dViewer: function () {
+        clear3dViewer: function() {
             console.log("clearing 3d viewer");
             chilipeppr.publish("/com-chilipeppr-widget-3dviewer/sceneclear");
             //if (this.obj3d) this.obj3d.children = [];            
@@ -604,10 +671,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.sceneRemoveMySceneGroup();
             this.mySceneGroup = null;
             console.log("after clearing Eagle BRD. this.obj3d:", this.obj3d, "this.mySceneGroup:", this.mySceneGroup);
-            
-            
+
+
             //this.sceneRemove(this.threeDimensions);
-            
+
             this.threeDimensions = null;
 
             // contains the end mill path (blue/gray line)
@@ -615,7 +682,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 this.sceneRemove(threeObj);
             }, this);*/
             this.threePathEndMill = [];
-            
+
             // contains the mesh signals (wires/pads/smds/vias)
             /*this.threePathEndMillArr.forEach(function(p) {
                 this.sceneRemove(p);
@@ -626,7 +693,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.threePathInflatedActualArr.forEach(function(p) {
                 this.sceneRemove(p);
             }, this);*/
-            
+
             // now reset arrays since they're useless now that
             // we removed them and will regenerate below
             this.threePathEndMillArr = [];
@@ -636,7 +703,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.pathEndMillHolesArr = [];
             this.pathInflatedActualArr = [];
             this.pathDeflatedActualArr = [];
-            
+
             // reset all main properties
             //this.pathsUnion = null;
             this.clipperBySignalKey = [];
@@ -652,7 +719,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.paths = null; // final paths generated from onRefresh() used to export gcode
             this.pathsUnion = null;
             this.pathsUnionHoles = null;
-            
+
         },
         setupGcodeTab: function() {
             // attach click event to "Send Gcode to workspace" button
@@ -663,20 +730,20 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         sendGcodeToWorkspace: function() {
             this.exportGcode();
             var info = {
-                name: "Eagle BRD: " + this.fileInfo.name.replace(/.brd$/i, ""), 
+                name: "Eagle BRD: " + this.fileInfo.name.replace(/.brd$/i, ""),
                 lastModified: new Date()
             };
             // grab gcode from textarea
             var gcodetxt = $('.com-chilipeppr-widget-eagle-gcode').val();
-            
+
             if (gcodetxt.length < 10) {
                 chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", "Error Sending Gcode", "It looks like you don't have any Gcode to send to the workspace. Huh?", 5 * 1000);
                 return;
             }
-            
+
             // send event off as if the file was drag/dropped
             chilipeppr.publish("/com-chilipeppr-elem-dragdrop/ondropped", gcodetxt, info);
-            
+
             // convert the color on the end mill path because it's irrelevant now based
             // on the gcode being shown by the 3d viewer
             this.threePathEndMill.forEach(function(threeObj) {
@@ -688,12 +755,13 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         threeObjChild.material.color = 0x000000;
                         threeObjChild.material.opacity = 0.1;
                     });*/
-                } else {
+                }
+                else {
                     threeObj.material.color = 0x000000;
                     threeObj.material.opacity = 0.1;
                 }
             }, this);
-            
+
             // or use alternate pubsub
             // "/com-chilipeppr-elem-dragdrop/loadGcode"
             var that = this;
@@ -702,7 +770,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 that.sceneReAddMySceneGroup();
             });
         },
-        setupDragDrop: function () {
+        setupDragDrop: function() {
             // subscribe to events
             chilipeppr.subscribe("/com-chilipeppr-elem-dragdrop/ondragover", this, this.onDragOver);
             chilipeppr.subscribe("/com-chilipeppr-elem-dragdrop/ondragleave", this, this.onDragLeave);
@@ -710,8 +778,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             chilipeppr.subscribe("/com-chilipeppr-elem-dragdrop/ondropped", this, this.onDropped, 9); // default is 10, we do 9 to be higher priority
         },
         eagle: null, // contains the eagle object
-        open: function (data, info) {
-            
+        open: function(data, info) {
+
             // if we are passed the file data, then use that, otherwise look to 
             // see if we had one saved from before, i.e. this is a browser reload scenario
             // and we'd like to show them their recent Eagle BRD
@@ -721,8 +789,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 file = data;
                 this.fileInfo = info;
                 $('#com-chilipeppr-widget-eagle .eagle-draghere').addClass("hidden");
-            } else {
-                
+            }
+            else {
+
                 // try to retrieve the most recent board file
                 file = localStorage.getItem('com-chilipeppr-widget-eagle-lastDropped');
                 if (file && file.length > 0) {
@@ -731,20 +800,21 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         this.fileInfo = JSON.parse(this.fileInfo);
                     }
                     console.log("open. loading data from localStorage. file.length:", file.length, "info:", this.fileInfo);
-                } else {
+                }
+                else {
                     // there's no file, just return
                     return;
                 }
 
             }
-            
+
             if (file) {
-                
+
                 // make sure this file is an Eagle board
                 if (!(file.match(/<!DOCTYPE eagle SYSTEM "eagle.dtd">/i))) {
                     chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", "Error Loading Eagle BRD", "It looks like you had a previous Eagle BRD, but it doesn't seem to be the correct format.", 10 * 1000);
                     return;
-                               
+
                 }
 
                 chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", "Opening Eagle BRD", "Parsing Eagle BRD file and generating signal paths.", 3000, true);
@@ -752,7 +822,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 this.activeLayer = 'Top';
                 this.clearEagleBrd();
                 this.clear3dViewer();
-                
+
                 // create board
                 this.eagle = new EagleCanvas('eagle-canvas');
                 this.eagle.loadText(file);
@@ -763,11 +833,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 this.draw3d(function() {
                     console.log("got callback from draw3d");
                 });
-                
-                
+
+
                 $('#com-chilipeppr-widget-eagle .btn-eagle-sendgcodetows').prop('disabled', false);
                 console.log("eagle:", this.eagle);
-            } else {
+            }
+            else {
                 console.log("no last file, so not opening");
             }
         },
@@ -778,27 +849,30 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
          * Alternately, we could render our board and then inject into the 3D
          * viewer later. Not sure why I didn't do it that way initially.
          */
-        draw3d: function (callback) {
+        draw3d: function(callback) {
             if (!this.is3dViewerReady) {
                 var that = this;
-                setTimeout(function () {
+                setTimeout(function() {
                     if (!that.is3dViewerReady) {
-                        setTimeout(function () {
+                        setTimeout(function() {
                             if (!that.is3dViewerReady) {
                                 console.log("giving up on drawing into 3d for Eagle Brd");
-                            } else {
+                            }
+                            else {
                                 console.log("ready to draw 3d on 3rd attempt");
                                 that.onDraw3dReady();
                                 if (callback) callback();
                             }
                         }, 5000);
-                    } else {
+                    }
+                    else {
                         console.log("ready to draw 3d on 2nd attempt");
                         that.onDraw3dReady();
                         if (callback) callback();
                     }
                 }, 2000);
-            } else {
+            }
+            else {
                 console.log("ready to draw 3d on 1st attempt");
                 this.onDraw3dReady();
                 if (callback) callback();
@@ -806,18 +880,19 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         },
         colorSignal: 9249571, // match eagle colors. red for top wire
         colorSmd: 9249571, // same color as signal (again top)
-        colorSignalBottom: 2302861,  //match eagle colors.  blue for bottom wire
-        colorSmdBottom: 2302861,  //same color as signal (again bottom)
+        colorSignalBottom: 2302861, //match eagle colors.  blue for bottom wire
+        colorSmdBottom: 2302861, //same color as signal (again bottom)
         colorVia: 11842560, // yellow
         colorPad: 2329891, // pads are green
         colorMill: 255, // match color ChiliPeppr shows for milling
         colorHole: 9276813, // light gray
-        colorsDrop: [2722312, 8817160, 9046024] , // green, yellow, red
+        colorsDrop: [2722312, 8817160, 9046024], // green, yellow, red
         colorDimension: 9276813, // light gray
         opacitySignal: 0.1,
         opacityDimension: 0.3,
         opacityVia: 0.1,
         opacityPad: 0.1,
+        opacityHole: 0.3,
         endmillSize: 0.0, // size of endmill that user picks
         actualEndmill: 0.2,
         inflateMillPathBy: null,
@@ -836,52 +911,66 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
          * polygons that may be on the board representing signal planes like a 
          * GND plane.
          */
-        onDraw3dReady: function () {
-    		console.group("draw3d");
+        onDraw3dReady: function() {
+
+            console.group("draw3d");
+
+            // inform any listeners that we're starting parsing, i.e. we're done with
+            // all of our draw3dxxx functions which means all our three.js objects
+            // and clipper objects are generated.
+            chilipeppr.publish("/" + this.id + '/beforeLayerGenerate', this);
+
             this.populateLayerToggleDropdown();
             console.log("iterating Eagle Brd and drawing into 3d viewer");
             console.log("eagle obj we will draw:", this.eagle);
             this.clear3dViewer();
-            
+
             //var activeLayer = 'Top';
             //var activeLayer = 'Bottom';
-            
+
             // these methods will draw all Eagle objects into several global
             // properties, the most important of which is this.clipperBySignalKey
             // which holds a structured object of each signal, i.e. +3V, GND, etc.
             this.draw3dSignalWires(this.eagle.eagleLayersByName[this.activeLayer]);
             this.draw3dSignalPolygons(this.eagle.eagleLayersByName[this.activeLayer]);
             this.draw3dElements(this.eagle.eagleLayersByName[this.activeLayer]);
-            
+
             this.draw3dVias('1-16');
+            this.draw3dHoles('1-48');
             this.threeDimensions = this.draw3dDimension(this.endmillSize);
             //this.obj3d.children = [];
-            
+
             // obj3d is the original THREE.Object3D() for the 3d
             // viewer. the extents x/y/z vals are calculated off of
             // it so we need a fake object to put in there
             console.log("this.obj3d:", this.obj3d);
-            
-            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/viewextents' );
+
+            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/viewextents');
+
+            // inform any listeners that we're done parsing, i.e. we're done with
+            // all of our draw3dxxx functions which means all our three.js objects
+            // and clipper objects are generated.
+            chilipeppr.publish("/" + this.id + '/afterLayerGenerate', this);
+
             setTimeout(this.onRefresh.bind(this, null, this.onDraw3dReadyAfter), 2000);
 
-            
+
             console.log("done drawing Eagle PCB Board");
             console.groupEnd();
         },
         onDraw3dReadyAfter: function() {
             console.log("onDraw3dReadyAfter");
             // ask 3d viewer to set things up now
-            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/setunits', "mm" );
-            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/drawextents' );
-            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/viewextents' );
+            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/setunits', "mm");
+            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/drawextents');
+            chilipeppr.publish('/com-chilipeppr-widget-3dviewer/viewextents');
             $(window).trigger('resize');
             if (this.obj3dmeta && this.obj3dmeta.widget)
                 this.obj3dmeta.widget.wakeAnimate();
         },
 
         // Section on exporting Gcode
-        
+
         clearanceHeight: 1.0, // move z to clearance
         // 1 oz = 0.035mm, 2 oz = 0.07mm, 3 oz = 0.105mm
         depthOfSignalMilling: -0.1, // cutting how deep?
@@ -895,41 +984,42 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         millDiameter: 2,
         stepDownDimensions: -0.5,
         stepDownPasses: 3, // use passes or dimension
-        generateGcodeHole:function(diameter, x, y){
-            var radius = diameter/2;
-            var gdiameter = radius-(this.millDiameter/2); // inside milling 
-            var passesDeep = this.depthOfDimensions/this.stepDownPasses; // TODO: calculate my own passes
-         
-            var result = '(generate hole at x:' + x + ' y:' + y + ' with dia:'+ diameter +' in ' + this.stepDownPasses + ' passes)' + "\n";
+        spindleRPM: 12000, // spindle rotation speed (rpm)
+        generateGcodeHole: function(diameter, x, y) {
+            var radius = diameter / 2;
+            var gdiameter = radius - (this.millDiameter / 2); // inside milling 
+            var passesDeep = this.depthOfDimensions / this.stepDownPasses; // TODO: calculate my own passes
+
+            var result = '(generate hole at x:' + x + ' y:' + y + ' with dia:' + diameter + ' in ' + this.stepDownPasses + ' passes)' + "\n";
             result += "F" + this.feedRateDimensions + "\n";
             // Lift off
             result += "G00 Z" + this.clearanceHeight + "\n";
             // Go to outside from circle
             result += "G00 X" + (x - gdiameter) + " Y" + y + "\n";
             // check passes            
-            for(var i=0; i<this.stepDownPasses;i++){
-               var deep = passesDeep*(i+1);
-               // plunge in material
-               result += "G00 Z" + deep.toFixed(4) + "\n";
-               // mill circle
-               result += "G02 I" + gdiameter.toFixed(4) + "\n";
+            for (var i = 0; i < this.stepDownPasses; i++) {
+                var deep = passesDeep * (i + 1);
+                // plunge in material
+                result += "G00 Z" + deep.toFixed(4) + "\n";
+                // mill circle
+                result += "G02 I" + gdiameter.toFixed(4) + "\n";
             }
 
             // Lift off
             result += "G00 Z" + this.clearanceHeight + "\n";
-         
+
             return result;
         },
-        exportGcodeHeader:function(){
+        exportGcodeHeader: function() {
             var g = '';
             g += "(Gcode generated by ChiliPeppr Eagle PCB Widget " + (new Date()).toLocaleString() + ")\n";
             g += "G21 (mm mode)\n";
             g += "G90 (abs mode)\n";
-            g += "M3 (spindle on)\n";
+            g += "M3 S" + this.spindleRPM + " (spindle on)\n";
             g += "TO M6 (set tool)\n"
             return g;
         },
-        exportGcodeMilling:function(){
+        exportGcodeMilling: function() {
             var g = '';
             this.paths.forEach(function(path) {
                 // move to clearance
@@ -953,7 +1043,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var dist = v1.distanceTo(v2);
                 if (dist > 2) {
                     // shorten it
-                    var direction = new THREE.Vector3(v2.x-v1.x, v2.y-v1.y, 0);
+                    var direction = new THREE.Vector3(v2.x - v1.x, v2.y - v1.y, 0);
                     direction.normalize();
                     var ray = new THREE.Ray(v1, direction);
                     v2 = ray.at(2);
@@ -964,121 +1054,121 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     // go to 3rd point as well
                     g += "G1 X" + path[2].X + " Y" + path[2].Y + "\n";
                 }
-                
+
                 // done with signal, go to z clearance
-                
-                
+
+
             }, this);
 
             return g;
         },
-        exportGcodeMarkVias:function(){
+        exportGcodeMarkVias: function() {
             var g = '';
             var that = this;
 
-            if(! $('#com-chilipeppr-widget-eagle .drill-markholes').is(':checked'))
-               return g;
+            if (!$('#com-chilipeppr-widget-eagle .drill-markholes').is(':checked'))
+                return g;
 
             // Drilling, first sort to drill diameter and change tool to first diameter
             g += "(------ MARK VIAS -------)\n";
-            for ( diameter in this.sortObjByKey(this.drillVias) ){
-                this.drillVias[diameter].forEach(function(dvector){
-                     g += "G0 Z" + that.clearanceHeight + "\n";
-                     g += "G0 X" + dvector.X + " Y" + dvector.Y   + "\n";
-                     g += "G0 Z0.1\n";
-                     g += "G1 Z" + that.depthOfSignalMilling  + "\n";
+            for (diameter in this.sortObjByKey(this.drillVias)) {
+                this.drillVias[diameter].forEach(function(dvector) {
+                    g += "G0 Z" + that.clearanceHeight + "\n";
+                    g += "G0 X" + dvector.X + " Y" + dvector.Y + "\n";
+                    g += "G0 Z0.1\n";
+                    g += "G1 Z" + that.depthOfSignalMilling + "\n";
                 });
                 g += "G0 Z" + that.clearanceHeight + "\n";
             }
             return g;
         },
-        exportGcodeMarkPads:function(){
+        exportGcodeMarkPads: function() {
             var g = '';
             var that = this;
 
-            if(! $('#com-chilipeppr-widget-eagle .drill-markholes').is(':checked'))
-               return g;
+            if (!$('#com-chilipeppr-widget-eagle .drill-markholes').is(':checked'))
+                return g;
 
             // Drilling, first sort to drill diameter and change tool to first diameter
             g += "(------ MARK PADS -------)\n";
-            for ( diameter in this.sortObjByKey(this.drillPads) ){
-               this.drillPads[diameter].forEach(function(dvector){
-                     g += "G0 Z" + that.clearanceHeight + "\n";
-                     g += "G0 X" + dvector.X + " Y" + dvector.Y   + "\n";
-                     g += "G0 Z0.1\n";
-                     g += "G1 Z" + that.depthOfSignalMilling  + "\n";
+            for (diameter in this.sortObjByKey(this.drillPads)) {
+                this.drillPads[diameter].forEach(function(dvector) {
+                    g += "G0 Z" + that.clearanceHeight + "\n";
+                    g += "G0 X" + dvector.X + " Y" + dvector.Y + "\n";
+                    g += "G0 Z0.1\n";
+                    g += "G1 Z" + that.depthOfSignalMilling + "\n";
                 });
                 g += "G0 Z" + that.clearanceHeight + "\n";
             }
             return g;
         },
-        exportGcodeDrillVias:function(){
+        exportGcodeDrillVias: function() {
             var g = '';
             var that = this;
 
-            if(! $('#com-chilipeppr-widget-eagle .use-drilling').is(':checked'))
-               return g;
+            if (!$('#com-chilipeppr-widget-eagle .use-drilling').is(':checked'))
+                return g;
 
             // Drilling, first sort to drill diameter and change tool to first diameter
             g += "(------ DRILLING VIAS -------)\n";
-            for ( diameter in this.sortObjByKey(this.drillVias) ){
-               g += "M5 (spindle off)\n";
-               g += "T" + this.toolCount++ + " M6 (set tool to drill with diameter " + diameter + ")\n";
-               g += "M3 (spindle on)\n";
-               g += "F" + this.drillFeedrate + "\n"; 
-               this.drillVias[diameter].forEach(function(dvector){
-                     g += "G0 Z" + that.clearanceHeight + "\n";
-                     g += "G0 X" + dvector.X + " Y" + dvector.Y   + "\n";
-                     g += "G0 Z" + that.clearanceHeight/10 + "\n";
-                     g += "G1 Z" + that.drillDepth  + "\n";
+            for (diameter in this.sortObjByKey(this.drillVias)) {
+                g += "M5 (spindle off)\n";
+                g += "T" + this.toolCount++ + " M6 (set tool to drill with diameter " + diameter + ")\n";
+                g += "M3 S" + this.spindleRPM + " (spindle on)\n";
+                g += "F" + this.drillFeedrate + "\n";
+                this.drillVias[diameter].forEach(function(dvector) {
+                    g += "G0 Z" + that.clearanceHeight + "\n";
+                    g += "G0 X" + dvector.X + " Y" + dvector.Y + "\n";
+                    g += "G0 Z" + that.clearanceHeight / 10 + "\n";
+                    g += "G1 Z" + that.drillDepth + "\n";
                 });
                 g += "G0 Z" + that.clearanceHeight + "\n";
             }
             return g;
         },
-        exportGcodeDrillPads:function(){
+        exportGcodeDrillPads: function() {
             var g = '';
 
-            if(! $('#com-chilipeppr-widget-eagle .use-drilling').is(':checked'))
-               return g;
+            if (!$('#com-chilipeppr-widget-eagle .use-drilling').is(':checked'))
+                return g;
 
             var that = this;
             g += "(------ DRILLING PADS -------)\n";
-            for ( diameter in this.sortObjByKey(this.drillPads)){
-               // don't drill holes bigger as max diameter
-               if(diameter > that.drillMaxDiameter)
-                  break;
-               g += "M5 (spindle off)\n";
-               g += "T" + this.toolCount++ + " M6 (set tool to drill with diameter " + diameter + ")\n";
-               g += "M3 (spindle on)\n";
-               g += "F" + this.drillFeedrate + "\n"; 
-               this.drillPads[diameter].forEach(function(dvector){
-                     g += "G0 Z" + that.clearanceHeight + "\n";
-                     g += "G0 X" + dvector.X + " Y" + dvector.Y   + "\n";
-                     g += "G0 Z" + that.clearanceHeight/10 + "\n";
-                     g += "G1 Z" + that.drillDepth  + "\n";
+            for (diameter in this.sortObjByKey(this.drillPads)) {
+                // don't drill holes bigger as max diameter
+                if (diameter > that.drillMaxDiameter)
+                    break;
+                g += "M5 (spindle off)\n";
+                g += "T" + this.toolCount++ + " M6 (set tool to drill with diameter " + diameter + ")\n";
+                g += "M3 S" + this.spindleRPM + " (spindle on)\n";
+                g += "F" + this.drillFeedrate + "\n";
+                this.drillPads[diameter].forEach(function(dvector) {
+                    g += "G0 Z" + that.clearanceHeight + "\n";
+                    g += "G0 X" + dvector.X + " Y" + dvector.Y + "\n";
+                    g += "G0 Z" + that.clearanceHeight / 10 + "\n";
+                    g += "G1 Z" + that.drillDepth + "\n";
                 });
                 g += "G0 Z" + that.clearanceHeight + "\n";
             }
             return g;
         },
-        exportGcodeDimensions:function(){
-            
+        exportGcodeDimensions: function() {
+
             var g = '';
             var that = this;
-            
+
             var diaOfEndmill = $('.dimension-mill-diameter').val();
-            
+
             // DIMENSION Milling
             g += "(------ DIMENSION Milling -------)\n";
             g += "M5 (spindle off)\n";
             g += "T" + this.toolCount++ + " M6 (set tool to mill dimension " + diaOfEndmill + ")\n";
-            g += "M3 (spindle on)\n";
+            g += "M3 S" + this.spindleRPM + " (spindle on)\n";
             g += "F" + this.feedRateDimensions + "\n";
 
 
             // generate holes are bigger as this.drillMaxDiameter
-            for ( diameter in this.sortObjByKey(this.drillPads)){
+            for (diameter in this.sortObjByKey(this.drillPads)) {
                 // only holes bigger as max diameter
                 if (diameter < that.drillMaxDiameter) continue;
                 this.drillPads[diameter].forEach(function(dvector) {
@@ -1086,18 +1176,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 });
             }
 
-            
+
             // generate dimensions
             // we need to take into account the diameter of the endmill
             // for milling dimensions
             console.group("Generating Dimension Milling");
-            
+
             // if we have no dimensions, then let's return
             if (!this.clipperDimension || !this.clipperDimension.length > 0) {
                 console.warn("for some reason there's no clipperDimension. huh?. returning.");
                 return g;
             }
-            
+
             // create new inflated path
             var millDim = this.getInflatePath([this.clipperDimension], diaOfEndmill / 2);
             millDim = millDim[0];
@@ -1106,7 +1196,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             console.log("inflated dimension:", millDim);
             var origClipperDimensions = this.clipperDimension;
             this.clipperDimension = millDim;
-            
+
             // TODO: please check if exists holes in eagle board
             // move to clearance
             g += "G0 Z" + this.clearanceHeight + "\n";
@@ -1117,7 +1207,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // move down
             g += "G0 Z0\n";
             var newZ = 0;
-            
+
             var didLastPass = false;
             while (!didLastPass) { //newZ > this.depthOfDimensions) {
                 newZ += this.stepDownDimensions;
@@ -1130,14 +1220,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 g += "G1 Z" + newZ + " F" + this.feedRatePlunge + "\n";
                 g += "F" + this.feedRateDimensions + "\n";
                 console.log("this.clipperDimension:", this.clipperDimension);
-                
+
                 // we have dimensions defined as linePieces so must eliminate duplicates
-                var lastPt = {X:null,Y:null};
+                var lastPt = {
+                    X: null,
+                    Y: null
+                };
                 this.clipperDimension.forEach(function(pt) {
                     console.log("making final dimension mill. pt:", pt, "lastPt:", lastPt);
                     if (pt.X == lastPt.X && pt.Y == lastPt.Y) {
                         //console.log("dimension mill: skipping pt:", pt);
-                    } else {
+                    }
+                    else {
                         //console.log("dimension mill: adding pt:", pt);
                         g += "G1 X" + pt.X + " Y" + pt.Y + "\n";
                     }
@@ -1148,20 +1242,20 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 // just to be safe, move to 2nd point no more than 3mm
                 //g += "G1 X" + this.clipperDimension[1].X + " Y" + this.clipperDimension[1].Y + "\n";
 
-                
+
             }
             this.clipperDimension = origClipperDimensions;
             console.groupEnd();
             return g;
         },
-        exportGcodeFooter:function(){
-            
+        exportGcodeFooter: function() {
+
             var g = '';
             g += "(------ FOOTER -------)\n";
 
             // move to clearance
             g += "G0 Z" + this.clearanceHeight + "\n";
-            
+
             // finalize gcode
             g += "M5 (spindle stop)\n";
             g += "M30 (prog stop)\n";
@@ -1177,58 +1271,59 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // we will also start at lower left and work our way along the end of each
             // path and move to next.
             // we also need to remove redundant moves.
-            
+
             this.toolCount = 0;
             var i = 100;
-            this.addGcode(i, this.exportGcodeHeader()     );
+            this.addGcode(i, this.exportGcodeHeader());
             i += 100;
-            this.addGcode(i, this.exportGcodeMilling()    );
+            this.addGcode(i, this.exportGcodeMilling());
             i += 100;
-            this.addGcode(i, this.exportGcodeMarkVias()   );
+            this.addGcode(i, this.exportGcodeMarkVias());
             i += 100;
-            this.addGcode(i, this.exportGcodeMarkPads()   );
+            this.addGcode(i, this.exportGcodeMarkPads());
             i += 100;
-            this.addGcode(i, this.exportGcodeDrillVias()  );
+            this.addGcode(i, this.exportGcodeDrillVias());
             i += 100;
-            this.addGcode(i, this.exportGcodeDrillPads()  );
+            this.addGcode(i, this.exportGcodeDrillPads());
             i += 100;
-            this.addGcode(i, this.exportGcodeDimensions() );
+            this.addGcode(i, this.exportGcodeDimensions());
             i = 2000;
-            this.addGcode(i, this.exportGcodeFooter()      ); // let space for additional gcode entrys
+            this.addGcode(i, this.exportGcodeFooter()); // let space for additional gcode entrys
 
             // ask for additional gcode
             // the user should synchronously inject it by calling back to us
             // with eagleWidget.addGcode();
             chilipeppr.publish(
-                "/com-chilipeppr-widget-eagle/addGcode", 
-                this.addGcode, 
-                this.gcodeParts, 
-                this, 
-                'You need to callback the first parameter with a command like firstParameter(1000, "my gcode");. ' + 
+                "/com-chilipeppr-widget-eagle/addGcode",
+                this.addGcode.bind(this),
+                this.gcodeParts,
+                this,
+                'You need to callback the first parameter with a command like firstParameter(1000, "my gcode");. ' +
                 '1000 would put your gcode after all the gcode generated by the base widget, but before the footer ' +
-                'which is at index of 2000. You can inspect the base widget gcode by looking at the 2nd parameter ' + 
+                'which is at index of 2000. You can inspect the base widget gcode by looking at the 2nd parameter ' +
                 'which is an array of the gcode parts and their indexes because you can insert anywhere there is an unused index.'
             );
 
             // once we get here all 3rd party add-ons that were listening for the publish should have
             // injected their gcode and we can now move on
             var g = this.getGcode();
-            
+
             console.log("done generating gcode. length:", g.length);
             $('.com-chilipeppr-widget-eagle-gcode').text(g);
         },
-        addGcode : function(count, gcode){
+        gcodeParts: [],
+        addGcode: function(count, gcode) {
             this.gcodeParts[count] = gcode;
         },
-        getGcode : function() {
+        getGcode: function() {
             console.log('Get gcodeParts: ', this.gcodeParts);
             return this.gcodeParts.join('');
         },
-        
-        
+
+
         // Actual parsing of Eagle object and rendering of Three.js objects
         // and the Clipper paths.
-        
+
         setupAdvancedInflateByUI: function() {
             var smdEl = $('#com-chilipeppr-widget-eagle .inflate-smds-by');
             var padEl = $('#com-chilipeppr-widget-eagle .inflate-pads-by');
@@ -1239,7 +1334,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var val = parseFloat(smdEl.val());
                 if (isNaN(val)) {
                     smdEl.addClass("alert-danger");
-                } else {
+                }
+                else {
                     smdEl.removeClass("alert-danger");
                 }
             });
@@ -1249,7 +1345,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var val = parseFloat(padEl.val());
                 if (isNaN(val)) {
                     padEl.addClass("alert-danger");
-                } else {
+                }
+                else {
                     padEl.removeClass("alert-danger");
                 }
             });
@@ -1259,11 +1356,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var val = parseFloat(viaEl.val());
                 if (isNaN(val)) {
                     viaEl.addClass("alert-danger");
-                } else {
+                }
+                else {
                     viaEl.removeClass("alert-danger");
                 }
             });
-                
+
             // bind ctrl+enter
             var that = this;
             $('#com-chilipeppr-widget-eagle #eagle-main input').keypress(function(evt) {
@@ -1274,36 +1372,39 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             });
         },
         onRefresh: function(event, callback) {
-            
+
             console.log("onRefresh. event:", event);
-            
+
             if (event) {
                 // this was from a button click. hide popover
                 $('#com-chilipeppr-widget-eagle .btn-refresh').popover('hide');
             }
-            
+
+            // fire off the pubsub signal indicating we're rendering
+            chilipeppr.publish('/' + this.id + '/beforeToolPathRender', this);
+
             this.inflateMillPathBy = parseFloat($('#com-chilipeppr-widget-eagle .inflate-by').val());
             var isMagicWand = $('#com-chilipeppr-widget-eagle .magic-wand-active').is(':checked');
             var isShow = $('#com-chilipeppr-widget-eagle .show-actual').is(':checked');
             var isSolid = $('#com-chilipeppr-widget-eagle .show-actual-asmesh').is(':checked');
-            
+
             var extraTxt = "";
             if (isShow) extraTxt += "<br/><br/>You are showing the toolpath, so that will be rendered as well.";
             if (isSolid) extraTxt += " You wanted to show the paths as solid, so that may take minutes to generate.";
             if (isMagicWand) extraTxt += "<br/><br/>You asked for the Magic Wand, so we need to generate constrained normals for all toolpaths. This will take a long time. Please be patient.";
-            
+
             chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", "Rendering Eagle BRD", "Rendering signals, vias, pads, SMD's, polygons, and thermals. " + extraTxt, 3 * 1000);
             // remove old mill path and inflated path
             setTimeout(this.onRefresh2nd.bind(this, event, callback), 200);
         },
         threePathEndMill: [],
         onRefresh2nd: function(event, callback) {
-            
+
             this.inflateMillPathBy = parseFloat($('#com-chilipeppr-widget-eagle .inflate-by').val());
             var isMagicWand = $('#com-chilipeppr-widget-eagle .magic-wand-active').is(':checked');
             var isShow = $('#com-chilipeppr-widget-eagle .show-actual').is(':checked');
             var isSolid = $('#com-chilipeppr-widget-eagle .show-actual-asmesh').is(':checked');
-            
+
             this.threePathEndMill.forEach(function(p) {
                 this.sceneRemove(p);
             }, this);
@@ -1312,10 +1413,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }, this);
             this.threePathEndMill = [];
             this.threePathEndMillArr = [];
-            
+
             this.clear3dViewer();
             this.sceneReAddMySceneGroup();
-            
+
             // COMPLICATED
             // 1. We need to create a path for the wires, smds, pads, and vias
             // for each signal
@@ -1323,9 +1424,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // from step 1. We should actually remave the inflated paths of the
             // step 1 poly. That will leave us with a clipped poly
             // 3. Then we remove smds and pads from the poly.
-            
-            
-            
+
+
+
             // let's let user use different inflate values for different types of segments
             var inflateBy = this.inflateMillPathBy;
             var inflateWiresBy = inflateBy; //0.35;
@@ -1333,13 +1434,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             var inflatePadsBy = inflateBy; //0.3;
             var inflateViasBy = inflateBy; //0.4;
             var inflatePolysBy = 0;
-            
+
             // See if user overrode these (which is only allowed without magic wand)
             if ($('#com-chilipeppr-widget-eagle .use-inflate-smds-by').is(':checked')) {
                 var val = parseFloat($('#com-chilipeppr-widget-eagle .inflate-smds-by').val());
                 if (isNaN(val)) {
                     $('#com-chilipeppr-widget-eagle .inflate-smds-by').addClass("alert-danger");
-                } else {
+                }
+                else {
                     $('#com-chilipeppr-widget-eagle .inflate-smds-by').removeClass("alert-danger");
                     inflateSmdsBy = val;
                 }
@@ -1348,7 +1450,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var val = parseFloat($('#com-chilipeppr-widget-eagle .inflate-pads-by').val());
                 if (isNaN(val)) {
                     $('#com-chilipeppr-widget-eagle .inflate-pads-by').addClass("alert-danger");
-                } else {
+                }
+                else {
                     $('#com-chilipeppr-widget-eagle .inflate-pads-by').removeClass("alert-danger");
                     inflatePadsBy = val;
                 }
@@ -1357,51 +1460,54 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var val = parseFloat($('#com-chilipeppr-widget-eagle .inflate-vias-by').val());
                 if (isNaN(val)) {
                     $('#com-chilipeppr-widget-eagle .inflate-vias-by').addClass("alert-danger");
-                } else {
+                }
+                else {
                     $('#com-chilipeppr-widget-eagle .inflate-vias-by').removeClass("alert-danger");
                     inflateViasBy = val;
                 }
             }
-            
+
             // let's use the new clipperBySignalKey object
             var paths = [];
             console.log("this.clipperBySignalKey:", this.clipperBySignalKey);
             var keys = Object.keys(this.clipperBySignalKey);
             var debugZ = 0.5;
-            
+
             // Step 0.8. If user wants to remove undefined SMDs from the path rendering
             // i.e. we'll just not mill them out
-            
+
             if ($('#com-chilipeppr-widget-eagle .use-smd-ignoreundefined').is(':checked')) {
 
-                console.log("removing undefined signal smds");                
+                console.log("removing undefined signal smds");
                 for (var i = 0; i < keys.length; i++) {
                     var key = keys[i];
                     var signal = this.clipperBySignalKey[key];
                     console.log("step 0.9 key:", key, "signal:", signal);
-                    
+
                     if (key === undefined || key == "undefined") {
                         console.log("found undefined key");
-                    } else {
+                    }
+                    else {
                         continue;
                     }
-                    
+
                     // add smds (pads without holes)
                     if (signal.smds && signal.smds.length > 0) {
-                        
+
                         // make backup copy in case user wants to add them back in
                         if (!('smdsBackup' in signal)) {
                             signal.smdsBackup = signal.smds;
                         }
-                        
+
                         delete signal.smds;
                         console.log("just deleted smds from signal:", signal);
-                        
+
                         //signal.smds.forEach(function(smd) {    
                         //}, this);
                     }
                 }
-            } else {
+            }
+            else {
                 // put back backup copy if it exists because we modify the original
                 // wire clipper paths if user chose to "clip wires", but we cheat by keeping
                 // a backup copy in case they uncheck the box later
@@ -1413,42 +1519,43 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         signal.smds = signal.smdsBackup;
                 }
             }
-            
+
             // Step 0.9. If user wants to clip wires out of SMDs do it at this step
             if ($('#com-chilipeppr-widget-eagle .use-smd-clipwire').is(':checked')) {
-                
+
                 for (var i = 0; i < keys.length; i++) {
                     var key = keys[i];
                     var signal = this.clipperBySignalKey[key];
                     console.log("step 0.9 key:", key, "signal:", signal);
-                    
+
                     // make backup copy of original signal.wire.clipper
                     if (!(signal.wire && signal.wire.clipper)) {
                         continue;
                     }
-                    
+
                     if (!('clipperBackup' in signal.wire))
                         signal.wire.clipperBackup = signal.wire.clipper;
-                    
+
                     // add smds (pads without holes)
                     if (signal.smds && signal.smds.length > 0) {
-                        
-                        signal.smds.forEach(function(smd) {    
-                            
+
+                        signal.smds.forEach(function(smd) {
+
                             // we have each smd looping here, so just diff out this smd
                             // from each wire in this signal
                             if (signal.wire && signal.wire.clipper.length > 0) {
                                 //signal.wire.clipper.forEach(function(path) {   
-                                    console.log("removing smd path from wire path. smd:", smd, "wire path:", signal.wire);
-                                
-                                    signal.wire.clipper = this.getDiffOfClipperPaths(signal.wire.clipper, [smd.clipper]);
+                                console.log("removing smd path from wire path. smd:", smd, "wire path:", signal.wire);
+
+                                signal.wire.clipper = this.getDiffOfClipperPaths(signal.wire.clipper, [smd.clipper]);
                                 //}, this);
                             }
-                            
+
                         }, this);
                     }
                 }
-            } else {
+            }
+            else {
                 // put back backup copy if it exists because we modify the original
                 // wire clipper paths if user chose to "clip wires", but we cheat by keeping
                 // a backup copy in case they uncheck the box later
@@ -1460,7 +1567,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 }
             }
 
-            
+
             // Step 1. Create a path for each signal that includes wires, pads,
             // smds, and vias
             console.log("doing step 1 of rendering");
@@ -1468,23 +1575,24 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var key = keys[i];
                 var signal = this.clipperBySignalKey[key];
                 console.log("step 1 key:", key, "signal:", signal);
-            
+
                 var signalPaths = [];
                 var signalPathsInflated = [];
                 var signalPathsInflatedHalf = [];
-                
+
                 // add smds (pads without holes)
                 if (signal.smds && signal.smds.length > 0) {
-                    
-                    signal.smds.forEach(function(smd) {    
+
+                    signal.smds.forEach(function(smd) {
                         signalPaths.push(smd.clipper);
-                        
+
                         // decide whether to inflate smds or not based on user settings
                         var ip, ipHalf, ipConstraint;
                         if (true) {
                             ip = this.getInflatePath([smd.clipper], inflateSmdsBy);
                             //ipHalf = this.getInflatePath([smd.clipper], inflateSmdsBy / 2);
-                        }  else {
+                        }
+                        else {
                             ip = [smd.clipper];
                         }
                         ip.forEach(function(ipath) {
@@ -1504,15 +1612,16 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                 // add pads (have holes)
                 if (signal.pads && signal.pads.length > 0) {
-                    signal.pads.forEach(function(pad) {    
+                    signal.pads.forEach(function(pad) {
                         signalPaths.push(pad.clipper);
-                        
+
                         // decide whether to inflate pads based on user settings
                         var ip, ipHalf;
                         if (true) {
                             ip = this.getInflatePath([pad.clipper], inflatePadsBy);
                             //ipHalf = this.getInflatePath([pad.clipper], inflatePadsBy / 2);
-                        }  else {
+                        }
+                        else {
                             ip = [smd.clipper];
                         }
                         ip.forEach(function(ipath) {
@@ -1523,18 +1632,19 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         });*/
                     }, this);
                 }
-                
+
                 // add vias
                 if (signal.vias && signal.vias.length > 0) {
-                    signal.vias.forEach(function(via) {    
+                    signal.vias.forEach(function(via) {
                         signalPaths.push(via.clipper);
-                        
+
                         // decide whether to inflate vias based on user settings
                         var ip, ipHalf;
                         if (true) {
                             ip = this.getInflatePath([via.clipper], inflateViasBy);
                             //ipHalf = this.getInflatePath([via.clipper], inflateViasBy / 2);
-                        }  else {
+                        }
+                        else {
                             ip = [smd.clipper];
                         }
                         ip.forEach(function(ipath) {
@@ -1548,9 +1658,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                 // add wires
                 if (signal.wire && signal.wire.clipper.length > 0) {
-                    signal.wire.clipper.forEach(function(path) {    
+                    signal.wire.clipper.forEach(function(path) {
                         signalPaths.push(path);
-                        
+
                         // decide whether to inflate wires based on user settings
                         var ip, ipHalf;
                         if (true) {
@@ -1559,18 +1669,20 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                                 // normal outer path
                                 ip = this.getInflatePath([path], inflateWiresBy);
                                 //ipHalf = this.getInflatePath([path], inflateWiresBy / 2);
-                            } else {
+                            }
+                            else {
                                 // hole path
                                 //console.warn("found hole path in signal wire. signal.wire:", signal.wire);
                                 ip = this.getInflatePath([path], inflateWiresBy * -1);
                                 //if (ClipperLib.Clipper.Orientation(ip)) {
-                                    //console.warn("this deflated hole does not look like a hole anymore. huh?. ip:", ip);
-                                    ClipperLib.Clipper.ReversePaths(ip);
+                                //console.warn("this deflated hole does not look like a hole anymore. huh?. ip:", ip);
+                                ClipperLib.Clipper.ReversePaths(ip);
                                 //}
                                 //ipHalf = this.getInflatePath([path], inflateWiresBy / 2 * -1);
                                 //ipHalf.reverse();
                             }
-                        }  else {
+                        }
+                        else {
                             ip = [smd.clipper];
                         }
                         ip.forEach(function(ipath) {
@@ -1581,26 +1693,26 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         });*/
                     }, this);
                 }
-                
+
                 // add this signal path to overall paths
                 var signalPathUnion = this.getUnionOfClipperPaths(signalPaths);
                 signal.path = signalPathUnion;
                 //if (key == "VSS") this.drawClipperPaths(signal.path, 0xff0000, 0.99, debugZ);
-               
+
                 // For pathInflated...
                 console.log("signalPathsInflated:", signalPathsInflated);
                 signal.pathInflated = this.getUnionOfClipperPaths(signalPathsInflated);
                 //if (key == "VSS") this.drawClipperPaths(signal.pathInflated, 0xff0000, 0.99, 2);
-                
+
                 // TODO: If we start using this inflated half again
                 //signal.pathInflatedHalf = this.getUnionOfClipperPaths(signalPathsInflatedHalf);
-                
+
                 //debugZ += 1;
-                
+
             }
             console.log("new clipperBySignalKey with overallPath:", this.clipperBySignalKey);
-            
-            
+
+
             // Step 1.5. Clip each fully inflated signal by the half inflated signal so
             // that we can try to get no overlap and instead end up with half an overlap.
             /*
@@ -1617,7 +1729,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 }
             }
             */
-            
+
             // Only do this step if user asked for Magic Wand
             // Step 1.5: Inflate paths with half constraint
             // now do magic wand
@@ -1626,9 +1738,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var key = keys[i];
                     var signal = this.clipperBySignalKey[key];
                     console.log("step 1.5 key:", key, "signal:", signal);
-                    
+
                     var signalPathsInflateConstraint = [];
-                    
+
                     // create constraint paths, which is all the other paths minus
                     // this one
                     var constraintPaths = [];
@@ -1640,7 +1752,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             constraintPaths.push(path);
                         });
                     }
-                    
+
                     // get inflated constraint path for this signal
                     if (i == 0) {
                         console.log("doing inflate with constraint for i:", i);
@@ -1649,18 +1761,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         ipc.forEach(function(ipath) {
                             signalPathsInflateConstraint.push(ipath);
                         });
-                        
-                        
+
+
                         // add this inflatedConstrained signal path to overall paths
                         var signalPathUnion = this.getUnionOfClipperPaths(signalPathsInflateConstraint);
                         signal.pathInflatedConstrained = signalPathUnion;
                         signal.pathInflated = signalPathUnion;
                     }
-                    
+
                 }
             }
-            
-            
+
+
             // Step 2. If a signal has a poly, remove from the polys the other paths
             // from step 1. We should actually remove the inflated paths of the
             // step 1 poly. That will leave us with a clipped poly
@@ -1668,16 +1780,16 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var key = keys[i];
                 var signal = this.clipperBySignalKey[key];
                 //console.log("signal:", signal);
-                
+
                 var signalPaths = [];
-                
+
                 // deal with clipping polygons in this signal by clipping
                 // them with any of the signals from other layers
                 if (signal.poly && signal.poly.polys.length > 0) {
-                    
+
                     var polyCtr = 0;
                     signal.poly.polys.forEach(function(poly) {
-                        
+
                         console.log("poly:", poly, "signal:", signal);
 
                         // create our start of new path
@@ -1691,7 +1803,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             //console.warn("found a cutout poly. still need to remove other signals");
                             //return;
                         }
-                            
+
                         // clip the poly by removing all paths from other signals
                         // loop thru all other inflated signal paths
                         for (var i2 = 0; i2 < keys.length; i2++) {
@@ -1699,7 +1811,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             var key2 = keys[i2];
                             var signal2 = this.clipperBySignalKey[key2];
                             poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, signal2.pathInflated);
-                            
+
                             // cutout other polys in the entire document from this poly
                             // as well but only if their rank is less than this poly's rank
                             if (signal2.poly && signal2.poly.polys.length > 0) {
@@ -1715,17 +1827,17 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                                         poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [poly2.clipper]);
                                     }
                                 }, this);
-                                
+
                                 // also handle cutout polys, where ranks aren't relevant
                                 signal.poly.polys.forEach(function(poly2) {
                                     if (poly2.pour == "cutout") {
                                         console.log("found poly that should cutout from other polys. poly2:", poly2);
-                                        poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [poly2.clipper]);                     
+                                        poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [poly2.clipper]);
                                     }
                                 }, this);
                             }
                         }
-                        
+
                         // additionally, this signal may have multiple polys and they
                         // may be setup for cutout of this one, so scan thru those
                         // and clip this poly if the other poly is asking us to
@@ -1737,18 +1849,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                                 console.log("poly2:", poly2, "signal:", signal);
                                 if (poly2.pour == "cutout") {
                                     console.log("found poly that should cutout from other polys. poly2:", poly2);
-                                    poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [poly2.clipper]);                     
+                                    poly.clipperWithOtherSignalsRemoved = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [poly2.clipper]);
                                 }
                                 polyCtr2++;
-                                
+
                             }, this);
                         }
-                         
+
                         //this.drawClipperPaths(poly.clipperWithOtherSignalsRemoved, 0xff0000, 0.99, debugZ);
                         //debugZ += 5;
-                        
+
                         polyCtr++;
-                        
+
                     }, this);
                 }
             }
@@ -1758,11 +1870,11 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i];
                 var signal = this.clipperBySignalKey[key];
-                
+
                 if (signal.poly && signal.poly.polys.length > 0) {
-                    
+
                     signal.poly.polys.forEach(function(poly) {
-                        
+
                         console.log("doing dimension clip. poly:", poly, "signal:", signal);
                         var regionOutside = this.getDiffOfClipperPaths(poly.clipperWithOtherSignalsRemoved, [this.clipperDimension]);
                         if (regionOutside != null && regionOutside.length > 0) {
@@ -1774,39 +1886,40 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     }, this);
                 }
             }
-            
+
             // Step 3. Now deal with removing smds/pads from the polys
             console.log("doing step 3");
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i];
                 var signal = this.clipperBySignalKey[key];
                 //console.log("signal:", signal);
-                
+
                 var signalPaths = [];
-                
+
                 // deal with clipping polygons in this signal by clipping
                 // them with any of the signals from other layers
                 if (signal.poly && signal.poly.polys.length > 0) {
-                    
+
                     signal.poly.polys.forEach(function(poly) {
-                        
+
                         console.log("poly:", poly, "signal:", signal);
                         //this.drawClipperPaths(poly.clipperWithOtherSignalsRemoved, 0xff0000, 0.9, debugZ);
                         //debugZ += 1;
-                        
+
                         if (poly.pour == "cutout") {
                             //console.error("need to create cutout algo. poly:", poly);
                             poly.finalClipper = poly.clipperWithOtherSignalsRemoved
                         }
-                        
-                        
+
+
                         // handle thermals
                         if (poly.thermals == "no") {
                             //signalPaths.push(poly.clipper);
                             //poly.finalClipper = [poly.clipper];
                             poly.finalClipper = poly.clipperWithOtherSignalsRemoved
-                        
-                        } else {
+
+                        }
+                        else {
                             // they want thermals
                             //console.warn("need to calculate thermals");
                             // do thermals on pads and smds only, not on wires or vias
@@ -1814,66 +1927,68 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             // then inflate the hole by inflateMillPathBy?
                             // then add stroked lines as cross hairs across hole
                             // then re-add pad/smd?
-                            
+
                             // create a path with holes, we may not get any
                             // based on the if statements below
                             var polyPathWithHoles = poly.clipperWithOtherSignalsRemoved;
                             //this.drawClipperPaths(polyPathWithHoles, 0x00ff00, 0.9, debugZ);
                             //debugZ += 0.1;
-                            
+
                             // remove the thermal shapes of smds from poly
                             if (signal.smds && signal.smds.length > 0) {
-                                
+
                                 // let's do alternate approach. sometimes smds can
                                 // overlap. it's not common, but on LED's for instance, multiple
                                 // smds are near each other to create a more unique shape for
                                 // the smd. so we need to union these and then do the thermal
                                 // for each polygon region, rather than relying on the smd's
                                 // themselves to indicate separation and independent thermals
-                                
+
                                 var newSmdPaths = [];
-                                signal.smds.forEach(function(smd) {   
+                                signal.smds.forEach(function(smd) {
                                     newSmdPaths.push(ClipperLib.JS.Clone(smd.clipper));
                                 }, this);
-                                
+
                                 var newSmdPathsUnion = this.getUnionOfClipperPaths(newSmdPaths);
                                 newSmdPathsUnion.forEach(function(path) {
-                                    var cutoutPath = this.createThermalCutoutsFromSmd({clipper: path}, poly, inflateSmdsBy); 
+                                    var cutoutPath = this.createThermalCutoutsFromSmd({
+                                        clipper: path
+                                    }, poly, inflateSmdsBy);
                                     // deflate the cutoutPath to ensure we don't run over the smd
                                     //cutoutPath = this.getInflatePath(cutoutPath, (inflateBy / 4) * -1);
-                                    
+
                                     // remove the cutoutPath from poly
                                     polyPathWithHoles = this.getDiffOfClipperPaths(polyPathWithHoles, cutoutPath);
                                 }, this);
-                                
-                            } 
-                            
+
+                            }
+
                             // remove the thermals shapes of pads from poly
                             if (signal.pads && signal.pads.length > 0) {
-                                
-                                signal.pads.forEach(function(pad) {   
-                                    
+
+                                signal.pads.forEach(function(pad) {
+
                                     console.log("removing thermal cutouts from poly. pad:", pad, "poly:", poly);
-                                    
-                                    var cutoutPath = this.createThermalCutoutsFromSmd(pad, poly, inflatePadsBy); 
-                                    
+
+                                    var cutoutPath = this.createThermalCutoutsFromSmd(pad, poly, inflatePadsBy);
+
                                     // deflate the cutoutPath to ensure we don't run over the smd
                                     //cutoutPath = this.getInflatePath(cutoutPath, inflateBy * -1);
-                           
+
                                     // remove the cutoutPath from poly
                                     polyPathWithHoles = this.getDiffOfClipperPaths(polyPathWithHoles, cutoutPath);
-                                         
+
                                 }, this);
-                            } 
-                            
+                            }
+
                             poly.finalClipper = polyPathWithHoles;
-                            
+
                         }
-                        
+
                         // debug. draw the final poly
                         //this.drawClipperPaths(poly.finalClipper, 0xff0000, 0.99, debugZ);
                         //debugZ += 2;
-                        
+
                     }, this);
                 }
             }
@@ -1882,8 +1997,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // TODO. Need to fire off pubsub so others, like Frank, can inject
             // here. Or, better yet let's get a more generic way of letting 3rd
             // party add-ons add stuff
-            
-                        // Step 4. We now have a gorgeous clipperBySignalKey with polys that are
+
+            // Step 4. We now have a gorgeous clipperBySignalKey with polys that are
             // correct with all stuff removed. We have wires, pads, smds, vias.
             // We now need to union each signal to one final master union path.
             // Then we'll render those paths.
@@ -1892,14 +2007,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var key = keys[i];
                 var signal = this.clipperBySignalKey[key];
                 console.log("key:", key, "signal:", signal);
-                
+
                 //signal.finalPath = ClipperLib.JS.Clone();
-                
+
                 // take main path and add poly
                 if (signal.poly && signal.poly.polys.length > 0) {
                     signal.poly.polys.forEach(function(poly) {
                         console.log("adding final poly. signal.pathInflated:", signal.pathInflated, "poly.finalClipper:", poly.finalClipper);
-                        
+
                         // don't add cutout polys, ignore them, they're just for clipping
                         // purposes
                         if (poly.pour == "cutout") {
@@ -1910,10 +2025,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         // drop all the original smds/pads/vias/wires inside that poly because
                         // we have our modified poly ready to put there and don't want 
                         // anything interfering with it
-                        
+
                         // however, to avoid problems, deflate the poly a tiny bit to do this
                         // so that when we do the final union we are guaranteed overlap
-                        
+
                         // we could possibly have a poly without signals
                         if (signal.pathInflated && signal.pathInflated.length > 0) {
                             var barelyDeflatedPoly = this.getInflatePath([poly.clipper], -0.00010);
@@ -1921,7 +2036,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             poly.finalClipper.forEach(function(path) {
                                 signal.pathInflated.push(path);
                             });
-                        } else {
+                        }
+                        else {
                             // just use the poly as final path
                             signal.pathInflated = poly.finalClipper;
                         }
@@ -1929,22 +2045,22 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     // now union the main path to the poly(s)
                     signal.pathInflated = this.getUnionOfClipperPaths(signal.pathInflated);
                 }
-                
+
                 signal.pathInflated.forEach(function(path) {
                     paths.push(path);
                 });
                 //var threePath = this.drawClipperPaths(signal.pathInflated, 0xff0000, 0.3, 3);
                 //this.threePathEndMillArr.push(threePath);
             }
-            
+
             // Step 5.
             // Now we should have a full signal path for each signal where we
             // have wires,smds,pads, and vias as well as the polygons where the
             // polygon is cutout cleanly to represent what you would see in Eagle
-            
+
             // Let's do an additional step and remove redundant lines so that we don't end
             // up with our endmill traversing the same path twice
-            
+
             // We want full cycles around each signal to avoid inaccuracy in the milling,
             // so we likely want to overreach the path by one line segment (or even measure
             // at least 2mm into the beginning of each path, or 10x the endmill size)
@@ -1953,7 +2069,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // will contain the majority of moves on it's own. But, start with shortest single
             // path and look to other signals to see if there are redundant lines and
             // remove them
-            
+
             // Sort shortest path first
             /*
             paths.sort(function (a, b) {
@@ -1972,7 +2088,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             //paths.push(ClipperLib.JS.Clone(paths[0]));
 
             // Sort longest path first
-            paths.sort(function (a, b) {
+            paths.sort(function(a, b) {
                 if (a.length > b.length) {
                     return -1;
                 }
@@ -1982,75 +2098,75 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 // a must be equal to b
                 return 0;
             });
-            
+
             // REDUNDANT PATH REDUCTION
             // Should really get this working to cut mill time in half
             if (false) {
-            // make all paths be outer orientation
-            for (var i = 0; i < paths.length; i++) {
-                var path = paths[i];
-                var orientation = ClipperLib.Clipper.Orientation(path);
-                if (orientation == false) {
-                    // it's a hole, reverse it
-                    console.log("found hole. reversing it.");
-                    path = path.reverse();
+                // make all paths be outer orientation
+                for (var i = 0; i < paths.length; i++) {
+                    var path = paths[i];
+                    var orientation = ClipperLib.Clipper.Orientation(path);
+                    if (orientation == false) {
+                        // it's a hole, reverse it
+                        console.log("found hole. reversing it.");
+                        path = path.reverse();
+                    }
                 }
-            }
 
-            console.log("doing redundant line ctr");
-            var redundantLineCtr = 0;
-            for (var path1Ctr = 0; path1Ctr < paths.length; path1Ctr++) {
-                var path1 = paths[path1Ctr];
-                for (var i = 0; i < path1.length; i++) {
-                    var pt1 = path1[i];
-                    var pt2 = (i+1 < path1.length) ? path1[i+1] : path1[0];
-                    for (var path2Ctr = 0; path2Ctr < paths.length; path2Ctr++) {
-                        if (path2Ctr == path1Ctr) continue; // skip myself
-                        var path2 = paths[path2Ctr];
-                        for (var i2 = 0; i2 < path2.length; i2++) {
-                            var pt2pt1 = path2[i2];
-                            var pt2pt2 = (i2+1 < path2.length) ? path2[i2+1] : path2[0];
-                            if (pt1 != null && pt2 != null && pt2pt1 != null && pt2pt2 != null && pt1.X == pt2pt1.X && pt1.Y == pt2pt1.Y && pt2.X == pt2pt2.X && pt2.Y == pt2pt2.Y) {
-                                //console.log("found redundant path. path1Ctr:", path1Ctr, "path2Ctr:", path2Ctr);    
-                                // try setting to null
-                                pt1 = null;
-                                path1[i] = null;
-                                pt2.markedForDelete = true;
-                                redundantLineCtr++;
+                console.log("doing redundant line ctr");
+                var redundantLineCtr = 0;
+                for (var path1Ctr = 0; path1Ctr < paths.length; path1Ctr++) {
+                    var path1 = paths[path1Ctr];
+                    for (var i = 0; i < path1.length; i++) {
+                        var pt1 = path1[i];
+                        var pt2 = (i + 1 < path1.length) ? path1[i + 1] : path1[0];
+                        for (var path2Ctr = 0; path2Ctr < paths.length; path2Ctr++) {
+                            if (path2Ctr == path1Ctr) continue; // skip myself
+                            var path2 = paths[path2Ctr];
+                            for (var i2 = 0; i2 < path2.length; i2++) {
+                                var pt2pt1 = path2[i2];
+                                var pt2pt2 = (i2 + 1 < path2.length) ? path2[i2 + 1] : path2[0];
+                                if (pt1 != null && pt2 != null && pt2pt1 != null && pt2pt2 != null && pt1.X == pt2pt1.X && pt1.Y == pt2pt1.Y && pt2.X == pt2pt2.X && pt2.Y == pt2pt2.Y) {
+                                    //console.log("found redundant path. path1Ctr:", path1Ctr, "path2Ctr:", path2Ctr);    
+                                    // try setting to null
+                                    pt1 = null;
+                                    path1[i] = null;
+                                    pt2.markedForDelete = true;
+                                    redundantLineCtr++;
+                                }
                             }
                         }
                     }
                 }
-            }
-            console.log("num of redundantLineCtr:", redundantLineCtr);
-            
-            // now loop thru and remove points that are nulls
-            var removedPtsCtr = 0;
-            var removedFromMarked = 0;
-            var newPaths = [];
-            for (var path1Ctr = 0; path1Ctr < paths.length; path1Ctr++) {
-                var path1 = paths[path1Ctr];
-                var newPath1 = [];
-                for (var i = 0; i < path1.length; i++) {
-                    var pt = path1[i];
-                    if (pt == null)
-                        removedPtsCtr++;
-                    else if (pt.markedForDelete)
-                        removedFromMarked++;
-                    else
-                        newPath1.push(pt);
+                console.log("num of redundantLineCtr:", redundantLineCtr);
+
+                // now loop thru and remove points that are nulls
+                var removedPtsCtr = 0;
+                var removedFromMarked = 0;
+                var newPaths = [];
+                for (var path1Ctr = 0; path1Ctr < paths.length; path1Ctr++) {
+                    var path1 = paths[path1Ctr];
+                    var newPath1 = [];
+                    for (var i = 0; i < path1.length; i++) {
+                        var pt = path1[i];
+                        if (pt == null)
+                            removedPtsCtr++;
+                        else if (pt.markedForDelete)
+                            removedFromMarked++;
+                        else
+                            newPath1.push(pt);
+                    }
+                    if (newPath1.length > 0)
+                        newPaths.push(newPath1);
                 }
-                if (newPath1.length > 0)
-                    newPaths.push(newPath1);
-            }
-            paths = newPaths;
-            console.log("removed all null pts. removedPtsCtr:", removedPtsCtr, "removedFromMarked:", removedFromMarked);
+                paths = newPaths;
+                console.log("removed all null pts. removedPtsCtr:", removedPtsCtr, "removedFromMarked:", removedFromMarked);
             } // end redundant path removal
-            
+
             // remove redundant paths
             this.debugZ = 2;
             //paths = this.redundantPathRemoval(paths);
-            
+
             // Now draw the paths
             var zLevel = 0;
             paths.forEach(function(path) {
@@ -2059,26 +2175,26 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 //zLevel += 0.1;
                 this.threePathEndMill.push(threePath);
             }, this);
-            
+
             // See if user wants to show actual endmill path as a cyan mesh
             zLevel = 5;
             if (isShow) {
                 this.actualEndmill = parseFloat($('#com-chilipeppr-widget-eagle .actual-endmill-size').val());
                 var localInflateBy = this.actualEndmill / 2;
                 var trueInflateBy = this.actualEndmill;
-                
+
                 //var pathDeflatedActualArr = [];
                 //var pathInflatedActualArr = [];
-                
+
                 // loop thru all paths and draw a mesh stroke
                 // around the path with opacity set, such that when
                 // multiples meshes are overlaid, their colors are darker
                 // to visualize the toolpath. that means creating normals
                 // for each pt and generating triangles to create mesh
-                
+
                 var group = new THREE.Object3D();
                 var pathCtr = 0;
-                
+
                 var mat = new THREE.MeshBasicMaterial({
                     color: 0x00ffff,
                     transparent: true,
@@ -2092,13 +2208,13 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     opacity: 0.99,
                     depthWrite: false
                 });
-                
+
                 paths.forEach(function(path) {
                     //if (pathCtr > 0) return;
                     //path = [{X:10, Y:10}, {X:20, Y:10}, {X:20, Y:20}];
                     //var geometry = new THREE.Geometry();
-                    
-                    
+
+
                     // create a clipper stroke path for each line segment
                     // we won't create one for the last pt because there's no line
                     // after it
@@ -2106,7 +2222,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var csThisPath = [];
                     //console.log("calculating stroke paths for each path");
                     for (var pi = 0; pi < path.length; pi++) {
-                        
+
                         var pt = path[pi];
                         //var pt2 = (pi + 1 < path.length) ? path[pi + 1] : null;
                         var pt2 = (pi + 1 < path.length) ? path[pi + 1] : path[0];
@@ -2118,20 +2234,20 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             csThisPath.push(clipperStroke[0]);
                             //this.drawClipperPaths(clipperStroke, 0xff0000, 0.99, 0);
                         }
-                        
+
                     }
                     var csUnion = this.getUnionOfClipperPaths(csThisPath);
                     //console.log("drawing csUnion:", csUnion);
-                    
+
                     if (!isSolid) {
                         var threeObj = this.drawClipperPaths(csUnion, 0x00ffff, 0.5, 0);
                         //this.sceneAdd(group);
                         this.threePathEndMillArr.push(threeObj);
                     }
-                    
+
                     // This is SUPER SLOW cuz of the triangle calculation
                     if (isSolid) {
-                        
+
                         //if (csUnion.length > 1) console.warn("got more than 1 path on union");
                         // investigate holes
                         var csUnionHoles = [];
@@ -2142,7 +2258,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                                 // do nothing.
                                 //console.log("outer path:", path);
                                 csUnionOuter.push(path);
-                            } else {
+                            }
+                            else {
                                 //console.warn("found a hole:", path);
                                 csUnionHoles.push(path);
                             }
@@ -2154,8 +2271,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         this.threePathEndMillArr.push(mesh);
                     }
                     //clipperStrokes.push(csUnion[0]);
-                    
-                    
+
+
                     // now subtract the subsequent stroke path from each line so we get
                     // no overlap
                     //console.log("subtracting subsequent path from each");
@@ -2192,7 +2309,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         }
                     }
                     */
-                    
+
                     /*
                     // we now have all our geometries and we want to merge them for efficiency
                     // but take the first, then last and work way to middle
@@ -2209,7 +2326,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var shapeMesh = new THREE.Mesh(geo, mat);
                     this.sceneAdd(shapeMesh);
                     */
-                    
+
                     // we drew all diffed paths, but the last segment did not get diffed
                     // so draw that as well
                     //console.log("drawing last stroke");
@@ -2218,53 +2335,57 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var mesh = this.createClipperPathsAsMesh(lastStroke, 0x00ffff, 0.2);
                     this.sceneAdd(mesh);
                     */
-                    
+
                     pathCtr++;
                 }, this);
-                
+
                 //this.sceneAdd(group);
                 //this.threePathEndMillArr.push(group);
                 //this.threePathDeflatedActualArr.push( group );
             }
-            
+
             // Export Gcode
             this.paths = paths;
             setTimeout(this.exportGcode.bind(this), 500);
-            
+
             if (callback) {
                 console.log("there was a callback after final drawing of board.");
                 callback();
             }
             //console.log("paths:", paths);
+
+            // fire off the pubsub signal indicating we're done rendering
+            chilipeppr.publish('/' + this.id + '/afterToolPathRender', this);
+
             console.log("done rendering Eagle BRD");
         },
         getInflatePathWithConstraint: function(paths, inflateBy, constraints) {
-            
+
             // This method will inflate a path, but not allow the inflate to go
             // beyond half the distance to the paths in contraints
-            
+
             console.log("getInflatePathWithConstraint. paths:", paths, "inflateBy", inflateBy, "constraints:", constraints);
-            
+
             var newPaths = ClipperLib.JS.Clone(paths);
 
             // draw the path we are inflating
             //this.drawClipperPaths(newPaths, 0x0000ff, 0.99, 3);
-            
+
             // draw the constraints
             var threeObj = this.drawClipperPaths(constraints, 0xff0000, 0.99, 3);
             this.threePathEndMillArr.push(threeObj);
-            
+
             // Step 0. Generate normals for the path.
             for (var i = 0; i < newPaths.length; i++) {
                 var path = newPaths[i];
-                                
+
                 // iterate through points and generate normals
                 for (var ptIndex = 0; ptIndex < path.length; ptIndex++) {
                     var pt = path[ptIndex];
                     pt.normals = this.getNormals(ptIndex, path);
                 }
             }
-            
+
             // Step 1. Build a Three.js object of the constraints as a per line structure
             // so when we raycast we get the individual line. I do think this could be
             // done as monolithic lines for better efficiency, but it may not help.
@@ -2277,7 +2398,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var cPath = constraints[i];
                 var groupOfLines = this.getThreeJsGroupOfLinesForPath(cPath, 0xff0000);
                 constraintGroup.add(groupOfLines);
-                
+
                 // create a big line group too cuz more efficient to raycast against
                 var lineGeo = new THREE.Geometry();
                 for (var i2 = 0; i2 < cPath.length; i2++) {
@@ -2294,7 +2415,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             console.log("group2:", group2);
             //group2.material.color = 0xff0000;
             this.sceneAdd(group2);
-            
+
             // Step 2. Build normals for each constraint line because we have to project
             // those normals onto our paths to see if we need to add extra points to better
             // follow the curvature of our environment
@@ -2305,7 +2426,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     cPt.normals = this.getNormals(ptIndex, cPath);
                 }
             }
-            
+
             // Step 3. Loop thru paths and look at each line of the path and see
             // if the constraints project onto us, meaning we'll raycast 2 normals
             // for each point on the constraint lines (so this is a ton of CPU 
@@ -2327,18 +2448,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             var debugZ = 3;
             for (var i = 0; i < newPaths.length; i++) {
                 var path = newPaths[i];
-                
+
                 //if (i != 1) continue;
-                
+
                 var newPath = [];
-                
+
                 // iterate through points (and lines)
                 for (var ptIndex = 0; ptIndex < path.length; ptIndex++) {
                     //if (ptIndex > 10) continue;
-                    
+
                     var pt = path[ptIndex];
                     var pt2 = (ptIndex + 1 < path.length) ? path[ptIndex + 1] : path[0];
-                    
+
                     // we will essentially generate a new line here, meaning we'll
                     // rebuild a new path where we will at least get the same
                     // points we started with if there are no intersections from
@@ -2347,7 +2468,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     pt.orig = true;
                     pt.origPtIndex = ptIndex;
                     newPath.push(pt);
-                    
+
                     var lineGeo = new THREE.Geometry();
                     var ptVector = new THREE.Vector3(pt.X, pt.Y, 0);
                     lineGeo.vertices.push(ptVector);
@@ -2355,28 +2476,28 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var myLineObj = new THREE.Line(lineGeo, (ptIndex % 2 == 0) ? lineMat : lineMat2);
                     var myLine = new THREE.Group();
                     myLine.add(myLineObj);
-                    
+
                     // DEBUG. Draw it
                     var myLine2 = myLine.clone();
                     myLine2.position.setZ(debugZ)
                     this.threePathEndMillArr.push(myLine2);
                     this.sceneAdd(myLine2);
                     //debugZ += 0.2;
-                    
+
                     // we could get some new points here from the constraints raycasted
                     // onto this line. if so keep an array. then de-dupe and sort by distance.
                     // then add to line
                     var newPts = [];
-                    
+
                     // see if the environment intersects with me
                     for (var ci = 0; ci < constraints.length; ci++) {
                         //if (ci > 0) continue;
                         var cPath = constraints[ci];
-                       
+
                         for (var cptIndex = 0; cptIndex < cPath.length; cptIndex++) {
                             //if (ptIndex != 0 && ptIndex != 34) continue;
                             var cpt = cPath[cptIndex];
-                            
+
                             // project normal to see if it intersects with myLine
                             //console.log("projecting normal to see if it intersects with myLine. cpt:", cpt);
                             //if (i == 1 && ptIndex == 0) this.drawNormal(cpt.normals.n1, cpt, inflateBy * 2, 0xff0000, 0.1, 2.9);
@@ -2388,12 +2509,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             if (rc1.length > 0) {
                                 var iPt = rc1[0];
                                 //console.log("found intersection of constraints onto myLine. ptIndex for myLine:", ptIndex, "rc1:", iPt);
-                                
+
                                 // reverse direction of the ray
-                                var newDir = {X:cpt.normals.n1.X * -1, Y:cpt.normals.n1.Y * -1};
+                                var newDir = {
+                                    X: cpt.normals.n1.X * -1,
+                                    Y: cpt.normals.n1.Y * -1
+                                };
                                 var newPt = {
-                                    X:iPt.point.x, 
-                                    Y:iPt.point.y,
+                                    X: iPt.point.x,
+                                    Y: iPt.point.y,
                                     normal: {
                                         dir: newDir,
                                         dist: iPt.distance / 2
@@ -2407,12 +2531,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             if (rc2.length > 0) {
                                 var iPt = rc2[0];
                                 //console.log("found intersection of constraints onto myLine. ptIndex for myLine:", ptIndex, "rc2:", iPt);
-                                
+
                                 // reverse direction of the ray
-                                var newDir = {X:cpt.normals.n2.X * -1, Y:cpt.normals.n2.Y * -1};
+                                var newDir = {
+                                    X: cpt.normals.n2.X * -1,
+                                    Y: cpt.normals.n2.Y * -1
+                                };
                                 var newPt = {
-                                    X:iPt.point.x, 
-                                    Y:iPt.point.y,
+                                    X: iPt.point.x,
+                                    Y: iPt.point.y,
                                     normal: {
                                         dir: newDir,
                                         dist: iPt.distance / 2
@@ -2422,39 +2549,39 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                                 // push this point onto newPath
                                 newPts.push(newPt);
 
-                            }   
-                            
+                            }
+
                         }
-                        
+
                     }
                     // done looking at contraint paths and points
-                    
+
                     // now that we have our newPts for myLine, we must de-dupe, then sort
                     // by distance
-                    
+
                     // de-dupe
                     if (newPts.length > 0) {
                         //console.log("newPts prior to de-dupe:", newPts);
                         newPtsDeDupe = this.uniqBy(newPts, JSON.stringify);
                         //console.log("newPts after de-dupe:", newPtsDeDupe);
-                        
+
                         // sort by distance 
                         // (also toss any newPt that matches the first point of myLine
                         // or the last point of myLine)
                         ptVector = new THREE.Vector3(pt.X, pt.Y, 0);
                         var newPts2 = [];
                         newPts.forEach(function(newPt) {
-                            
+
                             // check if this point matches the start/end of this line
                             // and if so, toss it
                             if (newPt.X == pt.X && newPt.Y == pt.Y) return;
                             if (newPt.X == pt2.X && newPt.Y == pt2.Y) return;
-                            
+
                             var newPtVector = new THREE.Vector3(newPt.X, newPt.Y, 0);
                             newPt.dist = ptVector.distanceTo(newPtVector);
                             newPts2.push(newPt);
                         });
-                        newPts2.sort(function (a, b) {
+                        newPts2.sort(function(a, b) {
                             if (a.dist > b.dist) {
                                 return 1;
                             }
@@ -2464,7 +2591,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             // a must be equal to b
                             return 0;
                         });
-                        
+
                         // now push these new points
                         console.log("newPts after removing if start/end pt and sorting by distance. newPts:", newPts2);
                         newPts2.forEach(function(newPt2) {
@@ -2473,42 +2600,42 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         });
                     }
                 }
-                
+
                 // replace this path with our newpath
                 console.log("replacing old path with N points:", path.length, " with newPath with N points:", newPath.length, "newPath:", newPath);
                 newPaths[i] = newPath;
-                
+
             }
-            
+
             // WARNING. May have to eliminate points/rays from step above that are the
             // opposite direction of outward facing paths. I don't want any inward facing
             // normals/rays. However, they may get eliminated automatically in the union
             // operation at the end of the process
-            
+
             // Step 4. Now that we have all the points we need on our main
             // paths. Let's inflate now, but inflate intelligently, i.e don't
             // inflate beyond half the ray intersection of each normal
             for (var i = 0; i < newPaths.length; i++) {
                 var path = newPaths[i];
-                
+
                 //if (i != 1) continue;
-                
+
                 var inflatedPath = [];
-                
+
                 // iterate through points (and lines)
                 for (var ptIndex = 0; ptIndex < path.length; ptIndex++) {
                     //if (ptIndex > 10) continue;
-                    
+
                     var pt = path[ptIndex];
                     var pt2 = (ptIndex + 1 < path.length) ? path[ptIndex + 1] : path[0];
-                    
+
                     // draw shape from normal1 to normal2 to any points on our line up to,
                     // but not including pt2's normal1
                     console.log("drawing shape for ptIndex:", ptIndex, "pt:", pt);
-                    
-                    
+
+
                     if (pt.orig) {
-                        
+
                         // this is an original point, render the two normals
                         var n1Ray = new THREE.Ray(pt.normals.origin, pt.normals.n1.dir);
                         var n2Ray = new THREE.Ray(pt.normals.origin, pt.normals.n2.dir);
@@ -2524,11 +2651,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             var hitObj = rc1[0]; // use closest point we hit
                             console.log("rc1 hitObj:", hitObj);
                             n1Pt = n1Ray.at(hitObj.distance / 2);
-                        } else {
+                        }
+                        else {
                             // we did not hit constraint, so use normal inflation
                             n1Pt = n1Ray.at(inflateBy);
                         }
-                        
+
                         var rc2 = this.getIntersection(pt, pt.normals.n2, constraintLines, inflateBy * 2, 0xff0000);
                         var arrowHelper = new THREE.ArrowHelper(pt.normals.n2.dir, pt.normals.origin, inflateBy * 2, 0xff9900);
                         this.threePathEndMillArr.push(arrowHelper);
@@ -2539,43 +2667,52 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             var hitObj = rc2[0]; // use closest point we hit
                             console.log("rc2 hitObj:", hitObj);
                             n2Pt = n2Ray.at(hitObj.distance / 2);
-                        } else {
+                        }
+                        else {
                             // we did not hit constraint, so use normal inflation
                             n2Pt = n2Ray.at(inflateBy);
                         }
-                        
+
                         // order here is important. create winding triangles
                         // like the way Clipper.js does it
                         // normal 1
-                        inflatedPath.push({X:n1Pt.x, Y:n1Pt.y, n1: true});
+                        inflatedPath.push({
+                            X: n1Pt.x,
+                            Y: n1Pt.y,
+                            n1: true
+                        });
                         // orig pt
                         //inflatedPath.push(pt);
                         // normal 2
-                        inflatedPath.push({X:n2Pt.x, Y:n2Pt.y, n2: true});
-                        
+                        inflatedPath.push({
+                            X: n2Pt.x,
+                            Y: n2Pt.y,
+                            n2: true
+                        });
+
                     }
                 }
-                
+
                 // DEBUG. draw clipper path of inflatedPath
                 var threeObj = this.drawClipperPaths([inflatedPath], 0x00ff00, 0.99, 3);
                 this.threePathEndMillArr.push(threeObj);
             }
-            
-            
+
+
             console.log("killing logging. done running");
             console.log = function() {};
             return newPaths;
-            
+
             // we have to build a three.js object of lines for absolutely every single
             // point in the entire structure of paths. this is a heavy object, but is 
             // needed for three.js's 
             var group = new THREE.Group();
             for (var i = 0; i < path.length; i++) {
-                
+
                 // generate a test path of individual three.js lines
                 var groupOfLines = this.getThreeJsGroupOfLinesForPath(newPath);
                 group.add(mainPath.groupOfLines);
-                
+
                 // also generate a normals array for each mainPath
                 // create normals for each pt on mainPath
                 // each pt gets 2 normals, one on left for incoming line and one
@@ -2584,40 +2721,40 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 for (var ptIndex = 0; ptIndex < mainPath.orig.length; ptIndex++) {
                     var pt = mainPath.orig[ptIndex];
                     var normals = this.getNormals(ptIndex, mainPath.orig);
-                    
+
                     //console.log("normals:", normals);
                     //var ah1 = this.drawNormal(normals.n1, pt, size, 0xff0000, 0.9, 0);
                     //var ah2 = this.drawNormal(normals.n2, pt, size, 0x00ff00, 0.9, 0);
                     //console.log("ah1:", ah1);
-                    
+
                     // figure out inflate point for normal 1
                     var iPt = {};
                     iPt.dir = new THREE.Vector3(normals.n1.X, normals.n1.Y, 0);
                     iPt.origin = new THREE.Vector3(pt.X, pt.Y, 0);
                     iPt.distance = size;
                     // figure out the final inflate position
-                    iPt.arrowHelper = new THREE.ArrowHelper( iPt.dir, iPt.origin, iPt.distance, 0xffff00 );
+                    iPt.arrowHelper = new THREE.ArrowHelper(iPt.dir, iPt.origin, iPt.distance, 0xffff00);
                     //this.sceneAdd(iPt.arrowHelper);
                     iPt.arrowHelper.updateMatrixWorld();
                     var vector = iPt.arrowHelper.line.geometry.vertices[1].clone();
-                    vector.applyMatrix4( iPt.arrowHelper.line.matrixWorld );
+                    vector.applyMatrix4(iPt.arrowHelper.line.matrixWorld);
                     iPt.inflatePt = vector;
                     //console.log("about to create particle for final inflate pt:", iPt.inflatePt);
                     var particle = this.getParticle(iPt.inflatePt.x, iPt.inflatePt.y, iPt.inflatePt.z, 0x0000ff);
                     //this.sceneAdd(particle);
                     normals.n1.iPt = iPt;
-                    
+
                     // figure out inflate point for normal 2
                     var iPt = {};
                     iPt.dir = new THREE.Vector3(normals.n2.X, normals.n2.Y, 0);
                     iPt.origin = new THREE.Vector3(pt.X, pt.Y, 0);
                     iPt.distance = size;
                     // figure out the final inflate position
-                    iPt.arrowHelper = new THREE.ArrowHelper( iPt.dir, iPt.origin, iPt.distance, 0xffff00 );
+                    iPt.arrowHelper = new THREE.ArrowHelper(iPt.dir, iPt.origin, iPt.distance, 0xffff00);
                     //this.sceneAdd(iPt.arrowHelper);
                     iPt.arrowHelper.updateMatrixWorld();
                     var vector = iPt.arrowHelper.line.geometry.vertices[1].clone();
-                    vector.applyMatrix4( iPt.arrowHelper.line.matrixWorld );
+                    vector.applyMatrix4(iPt.arrowHelper.line.matrixWorld);
                     iPt.inflatePt = vector;
                     //console.log("about to create particle for final inflate pt:", iPt.inflatePt);
                     var particle = this.getParticle(iPt.inflatePt.x, iPt.inflatePt.y, iPt.inflatePt.z, 0x0000ff);
@@ -2635,8 +2772,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         // to show popups and hilite signals as you move your mouse around. I
         // have found this to be one of the nicest parts of the Eagle BRD Import
         // to visualize the Eagle BRD better than what Eagle lets us do
-        
-                raycaster: null,
+
+        raycaster: null,
         projector: null, // = new THREE.Projector();
         arrowHelper: null,
         intersectObjects: [], // contains three.js objects that we want to detect on mouse movement in the 3d viewer
@@ -2645,7 +2782,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         infoSignalArea: null,
         lastIntersect: null, // last obj we showed info for
         hidePopupsElem: null, // quick access to hide checkbox
-        setupMouseOver: function () {
+        setupMouseOver: function() {
             this.raycaster = new THREE.Raycaster();
             //this.projector = new THREE.Projector();
             $('#com-chilipeppr-widget-3dviewer-renderArea').mousemove(this.onMouseOver.bind(this));
@@ -2661,12 +2798,13 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 if (that.hidePopupsElem.is(":checked")) {
                     // hide
                     that.deactivateMouseMove();
-                } else {
+                }
+                else {
                     // unhide
                     that.reactivateMouseMove();
                 }
             });
-            
+
         },
         reactivateMouseMove: function() {
             // add mouseover event
@@ -2680,11 +2818,11 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.hidePopups();
         },
         hidePopups: function() {
-            
+
             console.log("hiding popups and resetting opacities");
             this.infoSignalArea.addClass('hidden');
             this.infoArea.addClass('hidden');
-            
+
             // reset opacities
             if (this.lastIntersect != null) {
                 console.log("lastIntersect:", this.lastIntersect);
@@ -2700,11 +2838,11 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
         },
         lastIntersectOtherMaterials: [], // array to hold materials modified by mouseover so we can reset them later to normal opacity
-        onMouseOver: function (event) {
+        onMouseOver: function(event) {
 
-            if(this.hidePopupsElem.is(":checked"))
+            if (this.hidePopupsElem.is(":checked"))
                 return;
-            
+
             //console.log("onMouseOver. evt:", event);
             //return;
             //if (!event.ctrlKey) return;
@@ -2814,30 +2952,34 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     x += 30;
                     //y += 30;
 
-                    
+
                     var ud = obj.object.userData;
                     if (!('type' in ud)) {
                         // we found this thru recursion, go to parent
                         // to get userData
                         ud = obj.object.parent.userData;
                     }
-                    
+
                     // figure out signal name for this element that was moused over
                     var signalKey = "";
                     if (ud.type == "smd") {
                         signalKey = ud.elem.padSignals[ud.smd.name];
-                    } else if (ud.type == "pad") {
+                    }
+                    else if (ud.type == "pad") {
                         signalKey = ud.elem.padSignals[ud.pad.name];
-                    } else if (ud.type == "via") {
-                        signalKey = ud.name; 
-                    } else if (ud.type == "signal") {
+                    }
+                    else if (ud.type == "via") {
                         signalKey = ud.name;
-                    } else {
+                    }
+                    else if (ud.type == "signal") {
+                        signalKey = ud.name;
+                    }
+                    else {
                         console.error("got ud.type that we did not recognize. ud:", ud);
                     }
                     console.log("signalKey:", signalKey);
-                    
-                    
+
+
                     // update opacity for ALL smds/pads/vias/wires for this signal
                     // we use shared materials across all smds/pads/vias/wires
                     // so u only have to change the opacity once on each type
@@ -2845,9 +2987,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     //var signalKey = ud.name;
                     var signal = this.clipperBySignalKey[signalKey];
                     console.log("signal:", signal);
-                    
+
                     var opacity = 0.6;
-                    if (!obj.object.material.opacityBackup) 
+                    if (!obj.object.material.opacityBackup)
                         obj.object.material.opacityBackup = obj.object.material.opacity;
                     if (signal.smds && signal.smds.length > 0) {
                         signal.smds.forEach(function(smd) {
@@ -2872,13 +3014,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         this.lastIntersectOtherMaterials.push(material);
                     }
                     if (signal.wire && signal.wire.threeObj) {
-                       
+
                         if (signal.wire.threeObj instanceof THREE.Mesh) {
                             var material = signal.wire.threeObj.material;
                             if (!material.opacityBackup) material.opacityBackup = material.opacity;
                             material.opacity = opacity;
                             this.lastIntersectOtherMaterials.push(material);
-                        } else {
+                        }
+                        else {
                             signal.wire.threeObj.children.forEach(function(wire) {
                                 var material = wire.material;
                                 if (!material.opacityBackup) material.opacityBackup = material.opacity;
@@ -2894,27 +3037,28 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     // the signal items we already hilited
                     // see what type object
                     if (ud.type == "smd" || ud.type == "pad") {
-                        
+
                         this.infoArea.find('.info-package').text(ud.pkg.name);
                         this.infoArea.find('.info-elem-name').text(ud.elem.name);
                         this.infoArea.find('.info-elem-value').text(ud.elem.value);
                         //this.infoArea.find('.row-pad').removeClass("hidden");
 
                         // Add checkbox if dispenser == on
-                        if($('#com-chilipeppr-widget-eagle .dispenser-active').is(':checked')){
-                           this.infoArea.find('.info-elem-dispenser').removeClass('hidden');
-                           this.infoArea.find('.ignore-in-dispenser').change(function(e){
-                              ud['ignoreInDispenser'] = (this.checked ? true : false);
-                           });
-                        }else{
-                           this.infoArea.find('.info-elem-dispenser').addClass('hidden');
+                        if ($('#com-chilipeppr-widget-eagle .dispenser-active').is(':checked')) {
+                            this.infoArea.find('.info-elem-dispenser').removeClass('hidden');
+                            this.infoArea.find('.ignore-in-dispenser').change(function(e) {
+                                ud['ignoreInDispenser'] = (this.checked ? true : false);
+                            });
                         }
-                        
-                        
+                        else {
+                            this.infoArea.find('.info-elem-dispenser').addClass('hidden');
+                        }
+
+
                         this.infoSignalArea.addClass('hidden');
                         this.infoArea.removeClass('hidden');
                         this.infoArea.css('left', x + "px").css('top', y + "px");
-                        
+
                         if (ud.type == "smd") {
                             this.infoArea.find('.info-title').text("SMD Pad");
                             this.infoArea.find('.info-pad').text(ud.smd.name + " (of " + ud.pkg.smds.length + " smds)");
@@ -2922,7 +3066,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             if (sigName === undefined || sigName == null) sigName = "undefined";
                             this.infoArea.find('.info-signal').text(sigName);
                             this.infoArea.find('.info-layer').text(ud.smd.layer);
-                        } else {
+                        }
+                        else {
                             this.infoArea.find('.info-title').text("Pad");
                             this.infoArea.find('.info-pad').text(ud.pad.name + " (of " + ud.pkg.pads.length + " pads)");
                             var sigName = ud.elem.padSignals[ud.pad.name];
@@ -2931,9 +3076,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             this.infoArea.find('.info-layer').text("Top Copper");
                         }
 
-                    } else if (ud.type == "signal") {
+                    }
+                    else if (ud.type == "signal") {
                         console.log("mo on signal wire:", ud);
-                        this.infoSignalArea.find('.info-title').text("Signal");                        
+                        this.infoSignalArea.find('.info-title').text("Signal");
                         this.infoSignalArea.find('.info-signal').text(ud.name);
                         this.infoSignalArea.find('.info-layer').text(ud.layer.name);
                         this.infoSignalArea.find('.info-wirecnt').text(ud.layerWires.length);
@@ -2942,9 +3088,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         this.infoSignalArea.removeClass('hidden');
                         this.infoSignalArea.css('left', x + "px").css('top', y + "px");
 
-                    } else if (ud.type == "via") {
+                    }
+                    else if (ud.type == "via") {
                         console.log("via:", ud);
-                        this.infoSignalArea.find('.info-title').text("Via"); 
+                        this.infoSignalArea.find('.info-title').text("Via");
                         this.infoSignalArea.find('.info-signal').text(ud.name);
                         this.infoSignalArea.find('.info-layer').text(ud.via.layers);
                         this.infoSignalArea.find('.info-wirecnt').text("-");
@@ -2956,7 +3103,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                     obj.object.material.opacity = 0.8;
                 }
-            } else {
+            }
+            else {
                 // hide info area
 
                 this.infoArea.addClass('hidden');
@@ -2966,8 +3114,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         },
 
         // THIS SECTION OF CODE IS UTILITY METHODS FOR WORKING WITH CLIPPER.JS
-        
-        getXorOfClipperPaths: function (subj_paths, clip_paths) {
+
+        getXorOfClipperPaths: function(subj_paths, clip_paths) {
             //console.log("getXorOfClipperPaths");
             var cpr = new ClipperLib.Clipper();
             var scale = 10000;
@@ -2986,7 +3134,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             ClipperLib.JS.ScaleDownPaths(subj_paths, scale);
             return solution_paths;
         },
-        getIntersectionOfClipperPaths: function (subj_paths, clip_paths) {
+        getIntersectionOfClipperPaths: function(subj_paths, clip_paths) {
             //console.log("getIntersectionOfClipperPaths");
             var cpr = new ClipperLib.Clipper();
             var scale = 10000;
@@ -3005,7 +3153,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             ClipperLib.JS.ScaleDownPaths(subj_paths, scale);
             return solution_paths;
         },
-        getDiffOfClipperPaths: function (subj_paths, clip_paths) {
+        getDiffOfClipperPaths: function(subj_paths, clip_paths) {
             //console.log("getDiffOfClipperPaths");
             var cpr = new ClipperLib.Clipper();
             var scale = 10000;
@@ -3030,14 +3178,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 if (ClipperLib.Clipper.Orientation(path)) {
                     // we're fine. this is in outer mode
                     sol_path.push(path);
-                } else {
+                }
+                else {
                     // we should reverse it
                     sol_path.push(path.reverse());
                 }
             });
             return sol_path;
         },
-        getUnionOfClipperPaths: function (subj_paths) {
+        getUnionOfClipperPaths: function(subj_paths) {
             //console.log("getUnionOfClipperPaths");
             var cpr = new ClipperLib.Clipper();
             var scale = 100000;
@@ -3059,7 +3208,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             ClipperLib.JS.ScaleDownPaths(subj_paths, scale);
             return solution_paths;
         },
-        drawUnionOfClipperPaths: function (subj_paths) {
+        drawUnionOfClipperPaths: function(subj_paths) {
             var that = this;
             var solution_paths = this.getUnionOfClipperPaths(subj_paths);
 
@@ -3081,7 +3230,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 that.sceneAdd(lineUnion);
             }
         },
-        drawClipperPaths: function (paths, color, opacity, z, zstep, isClosed, isAddDirHelper) {
+        drawClipperPaths: function(paths, color, opacity, z, zstep, isClosed, isAddDirHelper) {
             console.log("drawClipperPaths");
             var lineUnionMat = new THREE.LineBasicMaterial({
                 color: color,
@@ -3097,7 +3246,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
             if (isClosed === undefined || isClosed == null)
                 isClosed = true;
-            
+
             var group = new THREE.Object3D();
 
             for (var i = 0; i < paths.length; i++) {
@@ -3106,7 +3255,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var actualZ = z;
                     if (zstep != 0) actualZ += zstep * j;
                     lineUnionGeo.vertices.push(new THREE.Vector3(paths[i][j].X, paths[i][j].Y, actualZ));
-                    
+
                     // does user want arrow helper to show direction
                     if (isAddDirHelper) {
                         /*
@@ -3138,10 +3287,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             this.sceneAdd(group);
             return group;
         },
-        createClipperPathsAsMesh: function (paths, color, opacity, holePath) {
+        createClipperPathsAsMesh: function(paths, color, opacity, holePath) {
             //console.log("createClipperPathsAsMesh. paths:", paths, "holePath:", holePath);
-            if(color === undefined)
-               color = this.colorDimension;
+            if (color === undefined)
+                color = this.colorDimension;
             var mat = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
@@ -3150,7 +3299,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 depthWrite: false
             });
 
-            
+
             if (paths.length == 1) {
                 var shape = new THREE.Shape();
                 var i = 0;
@@ -3159,14 +3308,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     if (j == 0) shape.moveTo(pt.X, pt.Y);
                     else shape.lineTo(pt.X, pt.Y);
                 }
-                
+
                 // see if asked to create hole
                 // multiple holes supported now
                 if (holePath !== undefined && holePath != null) {
                     if (!(Array.isArray(holePath))) {
                         holePath = [holePath];
                     }
-                    
+
                     for (var hi = 0; hi < holePath.length; hi++) {
                         var hp = holePath[hi];
                         console.log("adding hole:", hp);
@@ -3181,14 +3330,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     }
                 }
 
-                var geometry = new THREE.ShapeGeometry( shape );
+                var geometry = new THREE.ShapeGeometry(shape);
                 var shapeMesh = new THREE.Mesh(geometry, mat);
-                
+
                 //group.add(shapeMesh);
                 return shapeMesh;
-            } else {
+            }
+            else {
                 var group = new THREE.Object3D();
-                
+
                 for (var i = 0; i < paths.length; i++) {
                     var shape = new THREE.Shape();
                     for (var j = 0; j < paths[i].length; j++) {
@@ -3196,14 +3346,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         if (j == 0) shape.moveTo(pt.X, pt.Y);
                         else shape.lineTo(pt.X, pt.Y);
                     }
-                    
+
                     // see if asked to create hole
                     // multiple holes supported now
                     if (holePath !== undefined && holePath != null) {
                         if (!(Array.isArray(holePath))) {
                             holePath = [holePath];
                         }
-                        
+
                         for (var hi = 0; hi < holePath.length; hi++) {
                             var hp = holePath[hi];
                             console.log("adding hole:", hp);
@@ -3216,22 +3366,19 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             }
                             shape.holes.push(hole);
                         }
-                    }  
-                    
-                    var geometry = new THREE.ShapeGeometry( shape );
+                    }
+
+                    var geometry = new THREE.ShapeGeometry(shape);
                     var shapeMesh = new THREE.Mesh(geometry, mat);
-                    
+
                     group.add(shapeMesh);
                 }
                 return group;
             }
             //this.sceneAdd(group);
-            
+
         },
-        getInflatePath: function (paths, delta, joinType) {
-            
-            console.log ("inflate paths:  ", paths);
-            
+        getInflatePath: function(paths, delta, joinType) {
             var scale = 10000;
             ClipperLib.JS.ScaleUpPaths(paths, scale);
             var miterLimit = 2;
@@ -3255,27 +3402,27 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
         },
         createThermalCutoutsFromSmd: function(smd, poly, myInflateBy) {
-            
+
             console.log("creating thermal cutouts for an smd:", smd);
             var cutoutPath = ClipperLib.JS.Clone([smd.clipper]);
             //return cutoutPath;
-            
+
             // start with inflated smd 
             var inflatedSmd = this.getInflatePath(cutoutPath, myInflateBy);
-            
+
             // since we just want the endmill to go around the outside with a sliver
             // being cut off, deflate by 5% the inflateSmd path and then cutout from
             // inflateSmd
             var smdCutout = this.getInflatePath(inflatedSmd, myInflateBy * -0.05);
-            
+
             // cutout from inflatedSmd
             inflatedSmd = this.getDiffOfClipperPaths(inflatedSmd, smdCutout);
-            
+
             // now add back cross hairs, they should be width
             // of the poly outline stroke
             var width = poly.width;
             console.log("width of cross hairs:", width);
-            
+
             // get center of smd
             console.log("smd:", smd);
             // get bounding box
@@ -3285,54 +3432,55 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             console.log("bbox:", bbox);
             var cx = ((bbox.box.max.x - bbox.box.min.x) / 2) + bbox.box.min.x;
             var cy = ((bbox.box.max.y - bbox.box.min.y) / 2) + bbox.box.min.y;
-            var strokeX = this.addStrokeCapsToLine(bbox.box.min.x, cy, bbox.box.max.x, cy, width, "square" );
-            var strokeY = this.addStrokeCapsToLine(cx, bbox.box.min.y, cx, bbox.box.max.y, width, "square" );
+            var strokeX = this.addStrokeCapsToLine(bbox.box.min.x, cy, bbox.box.max.x, cy, width, "square");
+            var strokeY = this.addStrokeCapsToLine(cx, bbox.box.min.y, cx, bbox.box.max.y, width, "square");
             //strokeX = this.getAllPathsAsOuterOrientation(strokeX);
             var clipperStroke = this.getUnionOfClipperPaths([strokeX[0], strokeY[0]]);
             //this.drawClipperPaths(clipperStroke, 0x00ff00, 0.99, debugZ);
             // inflate stroke
             clipperStroke = this.getInflatePath(clipperStroke, myInflateBy / 2);
             console.log("clipperStroke:", clipperStroke);
-            
+
             // remove strokes from poly
             var pathWithStrokesRemoved = this.getDiffOfClipperPaths(inflatedSmd, clipperStroke);
             //this.drawClipperPaths(pathWithStrokesRemoved, 0x00ff00, 0.99, 5.0);
-            
+
             // remove non-inflated smd 
             //pathWithStrokesRemoved.push(smd.clipper);
             var pathWithSmdRemoved = this.getDiffOfClipperPaths(pathWithStrokesRemoved, [smd.clipper]);
             //this.drawClipperPaths(pathWithSmdRemoved, 0x0000ff, 0.99, 6.0);
-            
+
             return pathWithSmdRemoved;
         },
-        sortObjByKey: function (obj){
-          var keys = [];
-          var sorted_obj = {};
-      
-          for(var key in obj){
-              if(obj.hasOwnProperty(key)){
-                  keys.push(key);
-              }
-          }
-      
-          // sort keys
-          keys.sort();
-      
-          // create new array based on Sorted Keys
-          jQuery.each(keys, function(i, key){
-              sorted_obj[key] = obj[key];
-          });
-      
-          return sorted_obj;
+        sortObjByKey: function(obj) {
+            var keys = [];
+            var sorted_obj = {};
+
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    keys.push(key);
+                }
+            }
+
+            // sort keys
+            keys.sort();
+
+            // create new array based on Sorted Keys
+            jQuery.each(keys, function(i, key) {
+                sorted_obj[key] = obj[key];
+            });
+
+            return sorted_obj;
         },
 
 
 
         // THIS SECTION IS FOR WORKING ON THE DIMENSION OF THE BOARD
-        
+
         clipperDimension: [], // holds clipper formatted dimension
-        getDimensionWires: function () {
+        getDimensionWires: function() {
             var layerNumber = this.eagle.eagleLayersByName['Dimension'].number;
+            var layerName = this.activeLayer;
 
             // dimension is wires on layer 20
             var wires = [];
@@ -3365,29 +3513,47 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
             // build clipper dimension format
             this.clipperDimension = [];
-            for (var i = 0; i < wires.length; i++) {
-                var wire = wires[i];
-                //console.log("clipper appending wire:", wire);
-                this.clipperDimension.push({
-                    X: wire.x1,
-                    Y: wire.y1
-                });
-                this.clipperDimension.push({
-                    X: wire.x2,
-                    Y: wire.y2
-                });
-            }
 
+
+            if (layerName == "Bottom") {
+                for (var i = 0; i < wires.length; i++) {
+                    var wire = wires[i];
+                    //console.log("clipper appending wire:", wire);
+                    this.clipperDimension.push({
+                        X: (wire.x1), // SEB -
+                        Y: wire.y1
+                    });
+                    this.clipperDimension.push({
+                        X: (wire.x2), // SEB -
+                        Y: wire.y2
+                    });
+                }
+            }
+            else {
+                for (var i = 0; i < wires.length; i++) {
+                    var wire = wires[i];
+                    //console.log("clipper appending wire:", wire);
+                    this.clipperDimension.push({
+                        X: wire.x1,
+                        Y: wire.y1
+                    });
+                    this.clipperDimension.push({
+                        X: wire.x1,
+                        Y: wire.y1
+                    });
+                }
+            }
             //for (var signalKey in this.eagle.signalItems) {
             //}
             return wires;
         },
-        
-        
-        
-        draw3dDimension: function (endmillSize) {
+
+
+
+        draw3dDimension: function(endmillSize) {
             var that = this;
-            
+            var layerName = this.activeLayer;
+
             console.log("draw3dDimension", this.eagle);
             var wires = this.getDimensionWires();
             var color = this.colorDimension;
@@ -3400,17 +3566,35 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
             var lineGeo = new THREE.Geometry();
 
-            for (var i = 0; i < wires.length; i++) {
-                var wire = wires[i];
-                //console.log("working on wire:", wire);
 
-                lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
-                lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
-
+            if (layerName == "Bottom") {
+                for (var i = 0; i < wires.length; i++) {
+                    var wire = wires[i];
+                    //console.log("working on wire:", wire);
+                    //wire.x1 = -(wire.x1) // SEB
+                    //wire.x2 = -(wire.x2) // SEB
+                    lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
+                    lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
+                }
             }
+            else {
+                for (var i = 0; i < wires.length; i++) {
+                    var wire = wires[i];
+                    //console.log("working on wire:", wire);
+                    lineGeo.vertices.push(new THREE.Vector3(wire.x1, wire.y1, 0));
+                    lineGeo.vertices.push(new THREE.Vector3(wire.x2, wire.y2, 0));
+                }
+            }
+
+
             // now close the line by pushing first vertices
             if (wires.length > 0) {
-                lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));
+                if (layerName == "Bottom") {
+                    lineGeo.vertices.push(new THREE.Vector3((wires[0].x1), wires[0].y1, 0)); // SEB -x
+                }
+                else {
+                    lineGeo.vertices.push(new THREE.Vector3(wires[0].x1, wires[0].y1, 0));
+                }
             }
 
             var line = new THREE.Line(lineGeo, lineMat);
@@ -3420,15 +3604,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 that.rotateAroundObjectAxis (line, that.axisFlip, that.deg180toRad);
                 //placeholder for translating object by x or y board length
             }*/
-            
+
             var rFlip = (Math.PI / 180) * 180;
             var axisFlip = new THREE.Vector3(0, 1, 0);
-            if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) {  //If bottom layer flip board
-                console.log ("ray: Bottom Flip Dimension");
-                that.rotateAroundObjectAxis (line, axisFlip, rFlip);
+            if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
+                console.log("ray: Bottom Flip Dimension");
+                that.rotateAroundObjectAxis(line, axisFlip, rFlip);
                 //placeholder for translating object by x or y board length
             }
-            
+
             this.sceneAdd(line);
 
             // get the inflated milling area
@@ -3438,12 +3622,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             //return threeDim;
             return null;
         },
-        
+
         // UTILITY METHOD TO GENERATE A THREE.JS STROKE FOR A LINE
         // i.e. this takes a line with start/end and creates a stroked line with
         // a round end and returns a three.js object
-        
-        addStrokeCapsToLine: function (x1, y1, x2, y2, width, capType) {
+
+        addStrokeCapsToLine: function(x1, y1, x2, y2, width, capType) {
 
             var cap = capType != null ? capType : "round";
 
@@ -3537,10 +3721,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             var subj_paths = [];
             wireGrp.updateMatrixWorld();
             var lineCtr = 0;
-            wireGrp.children.forEach(function (line) {
+            wireGrp.children.forEach(function(line) {
                 //console.log("line in group:", line);
                 subj_paths.push([]);
-                line.geometry.vertices.forEach(function (v) {
+                line.geometry.vertices.forEach(function(v) {
                     //line.updateMatrixWorld();
                     //console.log("pushing v onto clipper:", v);
                     var vector = v.clone();
@@ -3563,9 +3747,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         // THIS SECTION TURNS THE BRD FILE INTO A USABLE JAVASCRIPT OBJECT
         // THAT IS STRUCTED BY THE SIGNAL NAME AND EACH SIGNAL CONTAINS ALL
         // ELEMENTS FOR THAT SIGNAL
-        
+
         // It also draws the basic Three.js objects for smds,pads,vias,wires.
-        
+
         // the mondo object contains the whole structure of the board
         // with objects for each key item. the main index is the signal name, i.e.
         // GND, +5V, etc.
@@ -3576,19 +3760,22 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             vias: [],
             smds: [],
             pads: [],
+            holes: [],
         },
         clipperSignalWires: [], // holds clipper formatted paths
         clipperSignalPolys: [], // holds clipper formatted polygons
-        draw3dVias: function (layersName) {
+
+        draw3dVias: function(layersName) {
             if (!layersName) return;
             var that = this;
             console.group("draw3dVias");
             //console.log("this.signalItems:", this.eagle.signalItems);
-            
+
             var bigSceneGroup = new THREE.Group();
-            
+            var layerName = this.activeLayer;
+
             for (var signalKey in this.eagle.signalItems) {
-                
+
                 var signalLayers = this.eagle.signalItems[signalKey];
                 var layerItems = signalLayers[layersName];
                 if (!layerItems) {
@@ -3596,12 +3783,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 }
                 var layerVias = layerItems['vias'] || [];
                 //console.log("layerVias:", layerVias);
-                
+
                 // create mondo storage
                 if (this.clipperBySignalKey[signalKey] === undefined)
                     this.clipperBySignalKey[signalKey] = {};
                 this.clipperBySignalKey[signalKey].vias = [];
-                
+
                 // create mesh version
                 var viaMat = new THREE.MeshBasicMaterial({
                     color: this.colorVia,
@@ -3616,118 +3803,237 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     opacity: 0.99
                 });
 
-                layerVias.forEach(function (via) {
-                    //console.log("generating circle for via:", via);
+                layerVias.forEach(function(via) {
+                    if (layerName == "Top") {
+                        //console.log("generating circle for via:", via);
 
-                    // save all drills for vias                  
-                    // Most exists only drills with diameter 1.0 0.9 0.8 ...
-                    var drill = via.drill.toFixed(1);
-                    if(that.drillVias[drill] === undefined)
-                        that.drillVias[drill] = [];
-                    that.drillVias[drill].push({
-                        X: via.x.toFixed(4),
-                        Y: via.y.toFixed(4),
-                        D: via.drill.toFixed(4)
-                    });
-                    
-                    
-                    var viashape = "round";
-                    if ('shape' in via) viashape = via.shape;
-                    
-                    var radius = via.drill; //(via.drill * 2) / 2;
-                    var segments = 32;
-                    if (viashape == "octagon") segments = 8;
-                    
-                    //maybe add var in front of viaGeo    
-                    viaGeo = new THREE.CircleGeometry(radius, segments);                    
-                    // Remove center vertex
-                    viaGeo.vertices.shift();
-                    //viaGeo.vertices.pop();
-                   
-                    var line = that.drawCircle(via.x, via.y, via.drill/2, that.colorHole);
-                    line.rotateZ(Math.PI / 8);
-                    
-                    bigSceneGroup.add (line);
-                    //this.sceneAdd(line);
-                    
-                    // Create shape with hole
-                    var shape = new THREE.Shape();
-                    
-                    // Add outside circle to via
-                    var ptCtr = 0;
-                    
-                    viaGeo.vertices.forEach(function (pt) {
-                        //console.log("pt on via:", pt);
-                        if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
-                        else shape.lineTo(pt.x, pt.y);
-                        ptCtr++;
-                    }, this);
-                    //console.log("shape", shape);
-                    //var pt = viaGeo.vertices[0];
-                    //shape.lineTo(pt.X, pt.y);
-                    
-                    // Create hole inside
-                    radius = via.drill / 2;
-                    segments = 32;
-                    
-                    holeGeo = new THREE.CircleGeometry(radius, segments);                    
-                    // Remove center vertex
-                    holeGeo.vertices.shift();
+                        // save all drills for vias                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = via.drill.toFixed(1);
+                        if (that.drillVias[drill] === undefined)
+                            that.drillVias[drill] = [];
+                        that.drillVias[drill].push({
+                            X: via.x.toFixed(4),
+                            Y: via.y.toFixed(4),
+                            D: via.drill.toFixed(4)
+                        });
 
-                    var hole = new THREE.Path();
-                    
-                    var ptCtr = 0;
-                    holeGeo.vertices.forEach(function (pt) {
-                        if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
-                        else hole.lineTo(pt.x, pt.y);
-                        ptCtr++;
-                    }, this);
-                    shape.holes.push(hole);
-                    
-                    // create mesh for the via
-                    var geometry = new THREE.ShapeGeometry( shape );
-                    var mesh = new THREE.Mesh(geometry, viaMat );
 
-                    // move shape to correct position
-                    mesh.position.set(via.x, via.y, 0);
-                    mesh.rotateZ(Math.PI / 8);
-                    
-                    mesh.userData["type"] = "via";
-                    mesh.userData["via"] = via;
-                    mesh.userData["name"] = signalKey;
-                    mesh.userData["layerVias"] = layerVias;
-                    
-                    bigSceneGroup.add (mesh);
-                    // this.sceneAdd(mesh);
-                    
-                    // add that these get detected during
-                    // mouseover
-                    this.intersectObjects.push(mesh);
+                        var viashape = "round";
+                        if ('shape' in via) viashape = via.shape;
 
-                    // add to via object
-                    via["threeObj"] = mesh;
-                    
-                    // add clipper path
-                    var clipperPath = [];
-                    line.updateMatrixWorld();
-                    line.geometry.vertices.forEach(function(v) {
-                        var vector = v.clone();
-                        var vec = line.localToWorld(vector);
-                        clipperPath.push({X: vec.x, Y: vec.y});
-                    }, this);
-                    this.clipperVias.push(clipperPath);
-                    
-                    // add to mondo object
-                    this.clipperBySignalKey[signalKey].vias.push({
-                        clipper: clipperPath,
-                        via: via,
-                        threeObj: mesh
-                    });
-                    
+                        var radius = via.drill; //(via.drill * 2) / 2;
+                        var segments = 32;
+                        if (viashape == "octagon") segments = 8;
+
+                        //maybe add var in front of viaGeo    
+                        viaGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        viaGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(via.x, via.y, via.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to via
+                        var ptCtr = 0;
+
+                        viaGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on via:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = viaGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = via.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var hole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                            else hole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(hole);
+
+                        // create mesh for the via
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, viaMat);
+
+                        // move shape to correct position
+                        mesh.position.set(via.x, via.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "via";
+                        mesh.userData["via"] = via;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerVias"] = layerVias;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        via["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: vec.x,
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].vias.push({
+                            clipper: clipperPath,
+                            via: via,
+                            threeObj: mesh
+                        });
+                    }
+                    else {
+                        //console.log("generating circle for via:", via);
+
+                        // save all drills for vias                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = via.drill.toFixed(1);
+                        if (that.drillVias[drill] === undefined)
+                            that.drillVias[drill] = [];
+                        that.drillVias[drill].push({
+                            X: -(via.x.toFixed(4)),
+                            Y: via.y.toFixed(4),
+                            D: via.drill.toFixed(4)
+                        });
+
+
+                        var viashape = "round";
+                        if ('shape' in via) viashape = via.shape;
+
+                        var radius = via.drill; //(via.drill * 2) / 2;
+                        var segments = 32;
+                        if (viashape == "octagon") segments = 8;
+
+                        //maybe add var in front of viaGeo    
+                        viaGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        viaGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(via.x, via.y, via.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to via
+                        var ptCtr = 0;
+
+                        viaGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on via:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = viaGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = via.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var hole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                            else hole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(hole);
+
+                        // create mesh for the via
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, viaMat);
+
+                        // move shape to correct position
+                        mesh.position.set(-(via.x), via.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "via";
+                        mesh.userData["via"] = via;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerVias"] = layerVias;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        via["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: -(vec.x),
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].vias.push({
+                            clipper: clipperPath,
+                            via: via,
+                            threeObj: mesh
+                        });
+                    }
+
+
+
+
                 }, this)
-                
+
             }
-            
+
             var rFlip = (Math.PI / 180) * 180;
             var axisFlip = new THREE.Vector3(0, 1, 0);
             if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
@@ -3737,22 +4043,326 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             } //vias get flipped
 
             that.sceneAdd(bigSceneGroup);
-            
+
             console.log("this.clipperBySignalKey[]:", this.clipperBySignalKey);
             console.groupEnd();
-        
+
         },
-        draw3dSignalWires: function (layer) {
+        
+
+
+
+
+
+
+
+
+
+        
+// SEB HOLES DRILL START
+
+draw3dHoles: function(layersName) {
+            if (!layersName) return;
+            var that = this;
+            console.group("draw3dHoles");
+            //console.log("this.signalItems:", this.eagle.signalItems);
+
+            var bigSceneGroup = new THREE.Group();
+            var layerName = this.activeLayer;
+
+            for (var signalKey in this.eagle.signalItems) {
+
+                var signalLayers = this.eagle.signalItems[signalKey];
+                var layerItems = signalLayers[layersName];
+                if (!layerItems) {
+                    continue;
+                }
+                var layerHoles = layerItems['holes'] || [];
+                //console.log("layerHoles:", layerHoles);
+
+                // create mondo storage
+                if (this.clipperBySignalKey[signalKey] === undefined)
+                    this.clipperBySignalKey[signalKey] = {};
+                this.clipperBySignalKey[signalKey].holes = [];
+
+                // create mesh version
+                var holeMat = new THREE.MeshBasicMaterial({
+                    color: this.colorHole,
+                    transparent: true,
+                    opacity: this.opacityHole,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                var lineMat = new THREE.LineBasicMaterial({
+                    color: this.colorHole,
+                    transparent: true,
+                    opacity: 0.99
+                });
+
+                layerHoles.forEach(function(ehole) {
+                    if (layerName == "Top") {
+                        //console.log("generating circle for hole:", hole);
+
+                        // save all drills for holes                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = ehole.drill.toFixed(1);
+                        if (that.drillHoles[drill] === undefined)
+                            that.drillHoles[drill] = [];
+                        that.drillHoles[drill].push({
+                            X: ehole.x.toFixed(4),
+                            Y: ehole.y.toFixed(4),
+                            D: ehole.drill.toFixed(4)
+                        });
+
+
+//                        var viashape = "round";
+//                        if ('shape' in via) viashape = via.shape;
+
+                        var radius = ehole.drill; //(hole.drill * 2) / 2;
+                        var segments = 32;
+//                        if (viashape == "octagon") segments = 8;
+
+                        //maybe add var in front of viaGeo    
+                        eholeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        eholeGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(ehole.x, ehole.y, ehole.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to via
+                        var ptCtr = 0;
+
+                        eholeGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on hole:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = holeGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = hole.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var hole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) hole.moveTo(pt.x, pt.y);
+                            else hole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(hole);
+
+                        // create mesh for the via
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, holeMat);
+
+                        // move shape to correct position
+                        mesh.position.set(ehole.x, ehole.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "hole";
+                        mesh.userData["hole"] = ehole;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerHoles"] = layerHoles;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        ehole["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: vec.x,
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].holes.push({
+                            clipper: clipperPath,
+                            ehole: ehole,
+                            threeObj: mesh
+                        });
+                    }
+                    else {
+                        //console.log("generating circle for via:", via);
+
+                        // save all drills for vias                  
+                        // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                        var drill = via.drill.toFixed(1);
+                        if (that.drillVias[drill] === undefined)
+                            that.drillVias[drill] = [];
+                        that.drillVias[drill].push({
+                            X: -(via.x.toFixed(4)),
+                            Y: via.y.toFixed(4),
+                            D: via.drill.toFixed(4)
+                        });
+
+
+                        var viashape = "round";
+                        if ('shape' in via) viashape = via.shape;
+
+                        var radius = via.drill; //(via.drill * 2) / 2;
+                        var segments = 32;
+                        if (viashape == "octagon") segments = 8;
+
+                        //maybe add var in front of viaGeo    
+                        viaGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        viaGeo.vertices.shift();
+                        //viaGeo.vertices.pop();
+
+                        var line = that.drawCircle(via.x, via.y, via.drill / 2, that.colorHole);
+                        line.rotateZ(Math.PI / 8);
+
+                        bigSceneGroup.add(line);
+                        //this.sceneAdd(line);
+
+                        // Create shape with hole
+                        var shape = new THREE.Shape();
+
+                        // Add outside circle to via
+                        var ptCtr = 0;
+
+                        viaGeo.vertices.forEach(function(pt) {
+                            //console.log("pt on via:", pt);
+                            if (ptCtr == 0) shape.moveTo(pt.x, pt.y);
+                            else shape.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        //console.log("shape", shape);
+                        //var pt = viaGeo.vertices[0];
+                        //shape.lineTo(pt.X, pt.y);
+
+                        // Create hole inside
+                        radius = via.drill / 2;
+                        segments = 32;
+
+                        holeGeo = new THREE.CircleGeometry(radius, segments);
+                        // Remove center vertex
+                        holeGeo.vertices.shift();
+
+                        var dhole = new THREE.Path();
+
+                        var ptCtr = 0;
+                        holeGeo.vertices.forEach(function(pt) {
+                            if (ptCtr == 0) dhole.moveTo(pt.x, pt.y);
+                            else dhole.lineTo(pt.x, pt.y);
+                            ptCtr++;
+                        }, this);
+                        shape.holes.push(dhole);
+
+                        // create mesh for the via
+                        var geometry = new THREE.ShapeGeometry(shape);
+                        var mesh = new THREE.Mesh(geometry, viaMat);
+
+                        // move shape to correct position
+                        mesh.position.set(-(via.x), via.y, 0);
+                        mesh.rotateZ(Math.PI / 8);
+
+                        mesh.userData["type"] = "via";
+                        mesh.userData["via"] = via;
+                        mesh.userData["name"] = signalKey;
+                        mesh.userData["layerVias"] = layerVias;
+
+                        bigSceneGroup.add(mesh);
+                        // this.sceneAdd(mesh);
+
+                        // add that these get detected during
+                        // mouseover
+                        this.intersectObjects.push(mesh);
+
+                        // add to via object
+                        via["threeObj"] = mesh;
+
+                        // add clipper path
+                        var clipperPath = [];
+                        line.updateMatrixWorld();
+                        line.geometry.vertices.forEach(function(v) {
+                            var vector = v.clone();
+                            var vec = line.localToWorld(vector);
+                            clipperPath.push({
+                                X: -(vec.x),
+                                Y: vec.y
+                            });
+                        }, this);
+                        this.clipperVias.push(clipperPath);
+
+                        // add to mondo object
+                        this.clipperBySignalKey[signalKey].vias.push({
+                            clipper: clipperPath,
+                            via: via,
+                            threeObj: mesh
+                        });
+                    }
+
+
+
+
+                }, this)
+
+            }
+
+            var rFlip = (Math.PI / 180) * 180;
+            var axisFlip = new THREE.Vector3(0, 1, 0);
+            if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
+                console.log("ray: Bottom Flip Vias (loc2)");
+                that.rotateAroundObjectAxis(bigSceneGroup, axisFlip, rFlip);
+                //placeholder for translating object by x or y board length
+            } //vias get flipped
+
+            that.sceneAdd(bigSceneGroup);
+
+            console.log("this.clipperBySignalKey[]:", this.clipperBySignalKey);
+            console.groupEnd();
+
+        },
+
+
+        
+// SEB HOLES DRILL END
+        
+        
+        
+        
+        draw3dSignalWires: function(layer) {
             //debugger;
             if (!layer) {
                 return;
             }
-            
-            
+
+
 
             console.group("draw3dSignalWires");
             console.log("layer:", layer);
-            
+
             var layerNumber = layer.number;
             var layerName = layer.name;
             //var tempColor = 11403055;
@@ -3767,7 +4377,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
               console.log("RAY!!! Bottom Color:  ", tempColor)
               }
               */
-              
+
             var that = this;
 
             var lineCap = 'round';
@@ -3776,132 +4386,260 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // contains all paths for each individual signal
             // so we can join them at the end
             var signalArr = [];
-            
+
             var bigSceneGroup = new THREE.Group();
 
-            for (var signalKey in this.eagle.signalItems) {
+            if (layerName == "Bottom") {
+                for (var signalKey in this.eagle.signalItems) {
 
-                var signalLayers = this.eagle.signalItems[signalKey],
-                    layerItems = signalLayers[layer.number];
-                if (!layerItems) {
-                    continue;
-                }
-                //console.log("layerItems:", layerItems);
-                var layerWires = layerItems['wires'] || [];
-                
-                console.log("layerWires:", layerWires);
-                
-                // create mondo storage
-                if (this.clipperBySignalKey[signalKey] === undefined)
-                    this.clipperBySignalKey[signalKey] = {};
-                this.clipperBySignalKey[signalKey].layer = layer;
-                this.clipperBySignalKey[signalKey].wire = {};
-                
-                //var that = this;
-
-                // per signal wire centipede
-                var centipede = [];
-
-                var scale = 10000;
-                //var that = this;
-
-                layerWires.forEach(function (wire) {
-                    //console.log("drawing wires. wire:", wire);
-
-                    // use new util function
-                    var sol_paths = that.addStrokeCapsToLine(wire.x1, wire.y1, wire.x2, wire.y2, wire.width);
-                    //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
-
-                    //console.log("about to add sol_paths to centipede:", sol_paths);
-                    centipede.push(sol_paths[0]);
-                    wire.clipper = sol_paths[0];
-
-                });
-
-                // merge centipede array of signals into single object
-                // do a union with Clipper.js
-                var sol_paths = this.getUnionOfClipperPaths(centipede);
-                //this.drawClipperPaths(sol_paths, this.colorSignal, 0.2);
-                
-                // we can get holes in sol_paths. it's rare but if a user created
-                // their board in such a way that they created a circle with their
-                // wires, we get a hole here. that means we need to separate those
-                // out before asking Three.js to draw the shape because it's not smart
-                // enough to look at winding order of the paths like Clipper.js is
-                var sol_pathsOuter = [];
-                var sol_pathsHoles = [];
-                sol_paths.forEach(function(path) {
-                    if (ClipperLib.Clipper.Orientation(path)) {
-                        sol_pathsOuter.push(path);
-                    } else {
-                        sol_pathsHoles.push(path);
+                    var signalLayers = this.eagle.signalItems[signalKey],
+                        layerItems = signalLayers[layer.number];
+                    if (!layerItems) {
+                        continue;
                     }
-                }, this);
-                // debug draw
-                if (sol_pathsHoles.length > 0) {
-                    console.log("Found signal wire path with holes:", sol_pathsHoles, "paths:", sol_pathsOuter, "signalKey:", signalKey);
-                    //this.drawClipperPaths(sol_pathsOuter, 0x0000ff, 0.99, 0);
-                    //this.drawClipperPaths(sol_pathsHoles, 0xff0000, 0.99, 0);
+                    //console.log("layerItems:", layerItems);
+                    var layerWires = layerItems['wires'] || [];
+
+                    console.log("layerWires:", layerWires);
+
+                    // create mondo storage
+                    if (this.clipperBySignalKey[signalKey] === undefined)
+                        this.clipperBySignalKey[signalKey] = {};
+                    this.clipperBySignalKey[signalKey].layer = layer;
+                    this.clipperBySignalKey[signalKey].wire = {};
+
+                    //var that = this;
+
+                    // per signal wire centipede
+                    var centipede = [];
+
+                    var scale = 10000;
+                    //var that = this;
+
+                    layerWires.forEach(function(wire) {
+                        //console.log("drawing wires. wire:", wire);
+                        // use new util function
+                        var sol_paths = that.addStrokeCapsToLine(-wire.x1, wire.y1, -wire.x2, wire.y2, wire.width);
+                        //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
+
+                        //console.log("about to add sol_paths to centipede:", sol_paths);
+                        centipede.push(sol_paths[0]);
+                        wire.clipper = sol_paths[0];
+                    });
+
+
+
+                    // merge centipede array of signals into single object
+                    // do a union with Clipper.js
+                    var sol_paths = this.getUnionOfClipperPaths(centipede);
+                    //this.drawClipperPaths(sol_paths, this.colorSignal, 0.2);
+
+                    // we can get holes in sol_paths. it's rare but if a user created
+                    // their board in such a way that they created a circle with their
+                    // wires, we get a hole here. that means we need to separate those
+                    // out before asking Three.js to draw the shape because it's not smart
+                    // enough to look at winding order of the paths like Clipper.js is
+                    var sol_pathsOuter = [];
+                    var sol_pathsHoles = [];
+                    sol_paths.forEach(function(path) {
+                        if (ClipperLib.Clipper.Orientation(path)) {
+                            sol_pathsOuter.push(path);
+                        }
+                        else {
+                            sol_pathsHoles.push(path);
+                        }
+                    }, this);
+                    // debug draw
+                    if (sol_pathsHoles.length > 0) {
+                        console.log("Found signal wire path with holes:", sol_pathsHoles, "paths:", sol_pathsOuter, "signalKey:", signalKey);
+                        //this.drawClipperPaths(sol_pathsOuter, 0x0000ff, 0.99, 0);
+                        //this.drawClipperPaths(sol_pathsHoles, 0xff0000, 0.99, 0);
+                    }
+
+                    // remove holes from each path even though that's redundant
+                    // Three.js seems to handle this ok as when it calculates triangles
+                    // it just sees the hole is nowhere near the triangles and moves on
+                    var mesh = this.createClipperPathsAsMesh(sol_pathsOuter, this.colorSignal, this.opacitySignal, sol_pathsHoles);
+                    // slide signal wire down a tinge on z
+                    // to make rendering prettier
+                    //mesh.position.set(0, 0, -0.00001);
+
+                    bigSceneGroup.add(mesh);
+
+                    // on layers other than top, we have to possibly apply a rotation/flip
+                    //debugger;
+                    /*
+                    if (layer == "Bottom") {
+                        // flip in Y axis
+                        var mS = (new THREE.Matrix4()).identity();
+                        //set -1 to the corresponding axis
+                        mS.elements[0] = -1;
+                        //mS.elements[5] = -1;
+                        //mS.elements[10] = -1;
+
+                        mesh.applyMatrix(mS);
+                    }*/
+
+                    // FINALLY. AFTER ALL THAT WORK. LETS ACTUALLY SHOW THE DARN USER THE
+                    // BEAUTIFUL 3D OBJECTS WE CREATED
+                    mesh.position.set(0, 0, -0.00001);
+                    //this.sceneAdd(mesh);
+
+                    // add userData for intersect
+                    mesh.userData.type = "signal";
+                    mesh.userData.name = signalKey;
+                    //mesh.userData.wire = wire;
+                    mesh.userData.signalKey = signalKey;
+                    mesh.userData.layerWires = layerWires;
+                    mesh.userData.signalLayers = signalLayers;
+                    mesh.userData.layerItems = layerItems;
+                    mesh.userData.layer = layer;
+                    //mesh.computeFaceNormals();
+                    //console.log("just added signal mesh to intersectObjects. mesh:", mesh);
+                    this.intersectObjects.push(mesh);
+
+                    // create record of this union'ed signal wire
+                    var ctr = 0;
+                    sol_paths.forEach(function(path) {
+                        that.clipperSignalWires[signalKey + "-" + ctr] = path;
+                        ctr++;
+                    });
+
+                    // add to mondo object
+                    this.clipperBySignalKey[signalKey].wire = {
+                        clipper: sol_paths,
+                        wires: layerWires,
+                        threeObj: mesh
+                    };
+
                 }
-                
-                // remove holes from each path even though that's redundant
-                // Three.js seems to handle this ok as when it calculates triangles
-                // it just sees the hole is nowhere near the triangles and moves on
-                var mesh = this.createClipperPathsAsMesh(sol_pathsOuter, this.colorSignal, this.opacitySignal, sol_pathsHoles);
-                // slide signal wire down a tinge on z
-                // to make rendering prettier
-                //mesh.position.set(0, 0, -0.00001);
-                
-                bigSceneGroup.add (mesh);
-
-                // on layers other than top, we have to possibly apply a rotation/flip
-                //debugger;
-                /*
-                if (layer == "Bottom") {
-                    // flip in Y axis
-                    var mS = (new THREE.Matrix4()).identity();
-                    //set -1 to the corresponding axis
-                    mS.elements[0] = -1;
-                    //mS.elements[5] = -1;
-                    //mS.elements[10] = -1;
-
-                    mesh.applyMatrix(mS);
-                }*/
-
-                // FINALLY. AFTER ALL THAT WORK. LETS ACTUALLY SHOW THE DARN USER THE
-                // BEAUTIFUL 3D OBJECTS WE CREATED
-                mesh.position.set(0,0,-0.00001);
-                //this.sceneAdd(mesh);
-                
-                // add userData for intersect
-                mesh.userData.type = "signal";
-                mesh.userData.name = signalKey;
-                //mesh.userData.wire = wire;
-                mesh.userData.signalKey = signalKey;
-                mesh.userData.layerWires = layerWires;
-                mesh.userData.signalLayers = signalLayers;
-                mesh.userData.layerItems = layerItems;
-                mesh.userData.layer = layer;
-                //mesh.computeFaceNormals();
-                //console.log("just added signal mesh to intersectObjects. mesh:", mesh);
-                this.intersectObjects.push(mesh);
-
-                // create record of this union'ed signal wire
-                var ctr = 0;
-                sol_paths.forEach(function (path) {
-                    that.clipperSignalWires[signalKey + "-" + ctr] = path;
-                    ctr++;
-                });
-
-                // add to mondo object
-                this.clipperBySignalKey[signalKey].wire = {
-                    clipper: sol_paths,
-                    wires: layerWires,
-                    threeObj: mesh
-                };
-
             }
-            
+            else {
+                for (var signalKey in this.eagle.signalItems) {
+
+                    var signalLayers = this.eagle.signalItems[signalKey],
+                        layerItems = signalLayers[layer.number];
+                    if (!layerItems) {
+                        continue;
+                    }
+                    //console.log("layerItems:", layerItems);
+                    var layerWires = layerItems['wires'] || [];
+
+                    console.log("layerWires:", layerWires);
+
+                    // create mondo storage
+                    if (this.clipperBySignalKey[signalKey] === undefined)
+                        this.clipperBySignalKey[signalKey] = {};
+                    this.clipperBySignalKey[signalKey].layer = layer;
+                    this.clipperBySignalKey[signalKey].wire = {};
+
+                    //var that = this;
+
+                    // per signal wire centipede
+                    var centipede = [];
+
+                    var scale = 10000;
+                    //var that = this;
+
+                    layerWires.forEach(function(wire) {
+                        //console.log("drawing wires. wire:", wire);
+                        // use new util function
+                        var sol_paths = that.addStrokeCapsToLine(wire.x1, wire.y1, wire.x2, wire.y2, wire.width);
+                        //that.drawClipperPaths(sol_paths, that.colorSignal, 0.2);
+
+                        //console.log("about to add sol_paths to centipede:", sol_paths);
+                        centipede.push(sol_paths[0]);
+                        wire.clipper = sol_paths[0];
+                    });
+
+
+
+                    // merge centipede array of signals into single object
+                    // do a union with Clipper.js
+                    var sol_paths = this.getUnionOfClipperPaths(centipede);
+                    //this.drawClipperPaths(sol_paths, this.colorSignal, 0.2);
+
+                    // we can get holes in sol_paths. it's rare but if a user created
+                    // their board in such a way that they created a circle with their
+                    // wires, we get a hole here. that means we need to separate those
+                    // out before asking Three.js to draw the shape because it's not smart
+                    // enough to look at winding order of the paths like Clipper.js is
+                    var sol_pathsOuter = [];
+                    var sol_pathsHoles = [];
+                    sol_paths.forEach(function(path) {
+                        if (ClipperLib.Clipper.Orientation(path)) {
+                            sol_pathsOuter.push(path);
+                        }
+                        else {
+                            sol_pathsHoles.push(path);
+                        }
+                    }, this);
+                    // debug draw
+                    if (sol_pathsHoles.length > 0) {
+                        console.log("Found signal wire path with holes:", sol_pathsHoles, "paths:", sol_pathsOuter, "signalKey:", signalKey);
+                        //this.drawClipperPaths(sol_pathsOuter, 0x0000ff, 0.99, 0);
+                        //this.drawClipperPaths(sol_pathsHoles, 0xff0000, 0.99, 0);
+                    }
+
+                    // remove holes from each path even though that's redundant
+                    // Three.js seems to handle this ok as when it calculates triangles
+                    // it just sees the hole is nowhere near the triangles and moves on
+                    var mesh = this.createClipperPathsAsMesh(sol_pathsOuter, this.colorSignal, this.opacitySignal, sol_pathsHoles);
+                    // slide signal wire down a tinge on z
+                    // to make rendering prettier
+                    //mesh.position.set(0, 0, -0.00001);
+
+                    bigSceneGroup.add(mesh);
+
+                    // on layers other than top, we have to possibly apply a rotation/flip
+                    //debugger;
+                    /*
+                    if (layer == "Bottom") {
+                        // flip in Y axis
+                        var mS = (new THREE.Matrix4()).identity();
+                        //set -1 to the corresponding axis
+                        mS.elements[0] = -1;
+                        //mS.elements[5] = -1;
+                        //mS.elements[10] = -1;
+
+                        mesh.applyMatrix(mS);
+                    }*/
+
+                    // FINALLY. AFTER ALL THAT WORK. LETS ACTUALLY SHOW THE DARN USER THE
+                    // BEAUTIFUL 3D OBJECTS WE CREATED
+                    mesh.position.set(0, 0, -0.00001);
+                    //this.sceneAdd(mesh);
+
+                    // add userData for intersect
+                    mesh.userData.type = "signal";
+                    mesh.userData.name = signalKey;
+                    //mesh.userData.wire = wire;
+                    mesh.userData.signalKey = signalKey;
+                    mesh.userData.layerWires = layerWires;
+                    mesh.userData.signalLayers = signalLayers;
+                    mesh.userData.layerItems = layerItems;
+                    mesh.userData.layer = layer;
+                    //mesh.computeFaceNormals();
+                    //console.log("just added signal mesh to intersectObjects. mesh:", mesh);
+                    this.intersectObjects.push(mesh);
+
+                    // create record of this union'ed signal wire
+                    var ctr = 0;
+                    sol_paths.forEach(function(path) {
+                        that.clipperSignalWires[signalKey + "-" + ctr] = path;
+                        ctr++;
+                    });
+
+                    // add to mondo object
+                    this.clipperBySignalKey[signalKey].wire = {
+                        clipper: sol_paths,
+                        wires: layerWires,
+                        threeObj: mesh
+                    };
+
+                }
+            }
+
             console.log("SignalWires mesh:  ", mesh, "  group:  ", bigSceneGroup);
             var rFlip = (Math.PI / 180) * 180;
             var axisFlip = new THREE.Vector3(0, 1, 0);
@@ -3912,13 +4650,13 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             } //signals flip code
 
             that.sceneAdd(bigSceneGroup);
-            
-            
+
+
             console.log("final list of clipper signal wires:", this.clipperSignalWires);
             console.log("this.clipperBySignalKey[]:", this.clipperBySignalKey);
             console.groupEnd();
         },
-        draw3dSignalPolygons: function (layer) {
+        draw3dSignalPolygons: function(layer) {
 
             if (!layer) {
                 return;
@@ -3926,7 +4664,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
             console.group("draw3dSignalPolygons");
             console.log("layer:", layer);
-            
+
             var layerNumber = layer.number;
 
             // contains all paths for each individual polygon
@@ -3942,16 +4680,16 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 }
                 //console.log("layerItems:", layerItems);
                 var layerPolys = layerItems['polygons'] || [];
-                
+
                 if (layerPolys.length == 0) continue;
                 console.log("layerPolys:", layerPolys);
-                
+
                 // create mondo storage
                 if (this.clipperBySignalKey[signalKey] === undefined)
                     this.clipperBySignalKey[signalKey] = {};
                 this.clipperBySignalKey[signalKey].layer = layer;
                 //this.clipperBySignalKey[signalKey].polys = [];
-                
+
                 var that = this;
 
                 // centipede is not the right reference here, but
@@ -3959,32 +4697,35 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 // i.e. GND, then we want all of these to act like one
                 // clipper path with multiple polygons
                 var centipede = [];
-                
+
                 if (layerPolys.length > 1) {
                     //console.error("have more than one polygon in a signal. need to test this. layerPolys:", layerPolys);
                 }
-                
-                layerPolys.forEach(function (poly) {
+
+                layerPolys.forEach(function(poly) {
                     console.log("drawing polys. poly:", poly);
 
                     var clipperPoly = [];
-                    
+
                     poly.vertices.forEach(function(v) {
-                        clipperPoly.push({X:v.x, Y:v.y});
+                        clipperPoly.push({
+                            X: v.x,
+                            Y: v.y
+                        });
                     });
-                    
+
                     // store in eagle obj for retrieval from mondo object
                     // later
-                    poly.clipper = clipperPoly;    
-                    
+                    poly.clipper = clipperPoly;
+
                     // not sure if merging these will work if multiple
                     // polys in one signal with different ranks,
                     // will have to test
-                    centipede.push(clipperPoly);                   
+                    centipede.push(clipperPoly);
 
                 });
                 console.log("poly centipede:", centipede);
-                
+
                 // merge centipede array of signals into single object
                 // do a union with Clipper.js
                 var sol_paths = this.getUnionOfClipperPaths(centipede);
@@ -3992,18 +4733,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 var mesh = this.createClipperPathsAsMesh(sol_paths, this.colorSignal, this.opacitySignal * 0.6);
                 // slide signal wire down a tinge on z
                 // to make rendering prettier
-                mesh.position.set(0,0,0.00001);
-                
+                mesh.position.set(0, 0, 0.00001);
+
                 var rFlip = (Math.PI / 180) * 180;
                 var axisFlip = new THREE.Vector3(0, 1, 0);
                 if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
                     console.log("ray: Bottom Flip Polygons");
                     that.rotateAroundObjectAxis(mesh, axisFlip, rFlip);
                     //placeholder for translating object by x or y board length
-                }   //polygons flip code
-                
+                } //polygons flip code
+
                 this.sceneAdd(mesh);
-                
+
                 // add userData for intersect
                 mesh.userData.type = "poly";
                 mesh.userData.name = signalKey;
@@ -4019,7 +4760,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                 // create record of this union'ed signal wire
                 var ctr = 0;
-                sol_paths.forEach(function (path) {
+                sol_paths.forEach(function(path) {
                     that.clipperSignalPolys[signalKey + "-" + ctr] = path;
                     ctr++;
                 });
@@ -4042,15 +4783,18 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         clipperVias: [], // subset of elements (vias)
         drillPads: {}, // save all pad drill vectors
         drillVias: {}, // save all via drill vectors
-        draw3dElements: function (layer) {
+
+        draw3dElements: function(layer) {
 
             if (!layer) return;
 
             console.group("draw3dElements");
 
             var that = this;
-            
+
             var bigSceneGroup = new THREE.Group();
+            //            var layerName = layer.name;
+            var layerName = this.activeLayer;
 
             for (var elemKey in this.eagle.elements) {
                 var elem = this.eagle.elements[elemKey];
@@ -4058,29 +4802,27 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 console.log("ray: elemKey:  ", elemKey, "  elem.mirror:  ", elem.mirror);
                 console.log("activeLayer:  ", this.activeLayer)
                 var renderThisPad;
-                if ((elem.mirror == false && this.activeLayer == 'Top') || (elem.mirror == true && this.activeLayer == 'Bottom')  )
-                { //|| (pad.drill && pad.drill > 0)
-                	renderThisPad = true;
-                	console.log ("ray:  this part is on the active layer:", elemKey);
+                if ((elem.mirror == false && this.activeLayer == 'Top') || (elem.mirror == true && this.activeLayer == 'Bottom')) { //|| (pad.drill && pad.drill > 0)
+                    renderThisPad = true;
+                    console.log("ray:  this part is on the active layer:", elemKey);
                 }
-                else
-                {
-                	renderThisPad = false;
+                else {
+                    renderThisPad = false;
                 }
-                console.log("pad.drill = ");  //, pad.drill
+                console.log("pad.drill = "); //, pad.drill
                 //renderThisPad = true;
-                
-								
+
+
                 // store clipper formatted points for this element
                 //this.clipperElements[elemKey] = [];
-								
+
                 var pkg = this.eagle.packagesByName[elem.pkg];
                 var rotMat = elem.matrix;
-								
+
                 // loop thru smds
                 var padCtr = 0;
                 var smdgroup = new THREE.Object3D();
-								
+
                 // insert smdgroup three.js obj into pkg
                 //pkg["threeObj"] = smdgroup;
                 elem["threeObj"] = {};
@@ -4089,165 +4831,165 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                 // CALCULATING SMDS
                 if (renderThisPad) {
-                pkg.smds.forEach(function (smd) {
+                    pkg.smds.forEach(function(smd) {
 
-                    console.log("drawing smd:", smd);
-                    var layerNum = smd.layer;
+                        console.log("drawing smd:", smd);
+                        var layerNum = smd.layer;
+
+                        /*
+                        if (elem.mirror) {
+                            console.log("mirror, since this elem is mirrored, we're getting the mirrorLayer from the eagle object. layerNum prior:", layerNum);
+                            layerNum = this.eagle.mirrorLayer(layerNum);
+                            console.log("mirror layerNum after:", layerNum);
+                        }
+                        */
+                        /*
+                        if (layer.number != layerNum) {
+                            return;
+                        }*/
+
+                        var lineGeo = new THREE.Geometry();
+                        var w2 = smd.dx / 2;
+                        var h2 = smd.dy / 2;
+                        lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2 * -1, 0));
+                        lineGeo.vertices.push(new THREE.Vector3(w2, h2 * -1, 0));
+                        lineGeo.vertices.push(new THREE.Vector3(w2, h2, 0));
+                        lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2, 0));
+                        // close it by connecting last point to 1st point
+                        lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2 * -1, 0));
+
+                        var lineMat = new THREE.LineBasicMaterial({
+                            color: that.colorSignal,
+                            transparent: true,
+                            opacity: 0.2
+                        });
+                        var line = new THREE.Line(lineGeo, lineMat);
+
+                        // do smd as mesh instead
+                        lineMat = new THREE.MeshBasicMaterial({
+                            color: that.colorSignal,
+                            transparent: true,
+                            opacity: 0.2,
+                            side: THREE.DoubleSide,
+                            //overdraw: false,
+                            //polygonOffset: true,
+                            depthWrite: false
+                        });
+                        //lineMat.side = THREE.DoubleSided;
+                        var holes = [];
+                        var triangles = THREE.ShapeUtils.triangulateShape(lineGeo.vertices, holes); //changed Shape.Utils to ShapeUtils per new Three revision
+
+                        for (var i = 0; i < triangles.length; i++) {
+
+                            lineGeo.faces.push(new THREE.Face3(triangles[i][0], triangles[i][1], triangles[i][2]));
+
+                        }
+                        //lineGeo.faces.push( new THREE.Face3( 0, 1, 2 ) );
+                        lineGeo.computeFaceNormals();
+                        line = new THREE.Mesh(lineGeo, lineMat);
+
+                        // add smd mesh to be found on mouse movements
+                        this.intersectObjects.push(line);
+
+                        // rotate
+                        // now that the smd is drawn, apply its individual
+                        // rotation
+                        if ('rot' in smd && smd.rot != null) {
+                            var rot = parseInt(smd.rot.replace(/R/i, ""));
+                            //console.log("will rotate individual smd by deg:", rot);
+                            if (rot > 0) {
+                                var r = (Math.PI / 180) * rot;
+                                //console.log("we are rotating individual smd by radians:", r);
+                                var axis = new THREE.Vector3(0, 0, 1);
+                                that.rotateAroundObjectAxis(line, axis, r);
+                            }
+                        }
+
+                        // set smd's x/y
+                        line.position.set(smd.x, smd.y, 0);
+                        line.userData["smdName"] = smd.name;
+                        line.userData["smd"] = smd;
+                        //line.userData["elemKey"] = elemKey;
+                        line.userData["elem"] = elem;
+                        //line.userData['pkgKey'] = elem.pkg;
+                        line.userData['pkg'] = pkg;
+                        line.userData["type"] = "smd";
+                        //console.log("adding smd line with userData:", line);
+
+                        // add this three.js obj to smd
+                        //smd["threeObj"] = line;
+                        elem["threeObj"]["smds"][smd.name] = line;
+
+                        smdgroup.add(line);
+                        //that.sceneAdd(line);
+                        //group.add(line);
+
+                        padCtr++;
+
+                    }, this);
+
 
                     /*
-                    if (elem.mirror) {
-                        console.log("mirror, since this elem is mirrored, we're getting the mirrorLayer from the eagle object. layerNum prior:", layerNum);
-                        layerNum = this.eagle.mirrorLayer(layerNum);
-                        console.log("mirror layerNum after:", layerNum);
-                    }
-                    */
-                    /*
-                    if (layer.number != layerNum) {
-                        return;
+                    if (elem.rot.match(/M/i)) {
+                      var axis = new THREE.Vector3(0, 1, 0);
+                           var r = (Math.PI / 180) * 180;
+                           that.rotateAroundObjectAxis(padgroup, axis, r);
+                           console.log ("ray: M matched");
+
                     }*/
+                    //var t = "M270"; console.log( parseInt(t.replace(/\D+/i,'')) )
 
-                    var lineGeo = new THREE.Geometry();
-                    var w2 = smd.dx / 2;
-                    var h2 = smd.dy / 2;
-                    lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2 * -1, 0));
-                    lineGeo.vertices.push(new THREE.Vector3(w2, h2 * -1, 0));
-                    lineGeo.vertices.push(new THREE.Vector3(w2, h2, 0));
-                    lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2, 0));
-                    // close it by connecting last point to 1st point
-                    lineGeo.vertices.push(new THREE.Vector3(w2 * -1, h2 * -1, 0));
+                    // now rotate and position the smdgroup
+                    //smdgroup
+                    if ('rot' in elem && elem.rot != null) {
+                        //var rot = parseInt(elem.rot.replace(/R/i, ""));
+                        var rot = parseInt(elem.rot.replace(/\D+/i, ''));
 
-                    var lineMat = new THREE.LineBasicMaterial({
-                        color: that.colorSignal,
-                        transparent: true,
-                        opacity: 0.2
-                    });
-                    var line = new THREE.Line(lineGeo, lineMat);
-
-                    // do smd as mesh instead
-                    lineMat = new THREE.MeshBasicMaterial({
-                        color: that.colorSignal,
-                        transparent: true,
-                        opacity: 0.2,
-                        side: THREE.DoubleSide,
-                        //overdraw: false,
-                        //polygonOffset: true,
-                        depthWrite: false
-                    });
-                    //lineMat.side = THREE.DoubleSided;
-                    var holes = [];
-                    var triangles = THREE.ShapeUtils.triangulateShape(lineGeo.vertices, holes); //changed Shape.Utils to ShapeUtils per new Three revision
-
-                    for (var i = 0; i < triangles.length; i++) {
-
-                        lineGeo.faces.push(new THREE.Face3(triangles[i][0], triangles[i][1], triangles[i][2]));
-
-                    }
-                    //lineGeo.faces.push( new THREE.Face3( 0, 1, 2 ) );
-                    lineGeo.computeFaceNormals();
-                    line = new THREE.Mesh(lineGeo, lineMat);
-
-                    // add smd mesh to be found on mouse movements
-                    this.intersectObjects.push(line);
-
-                    // rotate
-                    // now that the smd is drawn, apply its individual
-                    // rotation
-                    if ('rot' in smd && smd.rot != null) {
-                        var rot = parseInt(smd.rot.replace(/R/i, ""));
-                        //console.log("will rotate individual smd by deg:", rot);
+                        console.log("will rotate pkg smd by deg:", rot);
                         if (rot > 0) {
                             var r = (Math.PI / 180) * rot;
-                            //console.log("we are rotating individual smd by radians:", r);
+                            //console.log("we are rotating pkg smd by radians:", r);
                             var axis = new THREE.Vector3(0, 0, 1);
-                            that.rotateAroundObjectAxis(line, axis, r);
+                            that.rotateAroundObjectAxis(smdgroup, axis, r);
                         }
                     }
 
-                    // set smd's x/y
-                    line.position.set(smd.x, smd.y, 0);
-                    line.userData["smdName"] = smd.name;
-                    line.userData["smd"] = smd;
-                    //line.userData["elemKey"] = elemKey;
-                    line.userData["elem"] = elem;
-                    //line.userData['pkgKey'] = elem.pkg;
-                    line.userData['pkg'] = pkg;
-                    line.userData["type"] = "smd";
-                    //console.log("adding smd line with userData:", line);
 
-                    // add this three.js obj to smd
-                    //smd["threeObj"] = line;
-                    elem["threeObj"]["smds"][smd.name] = line;
+                    // see if smd group is mirrored
+                    //console.log("checking if elem is mirrored. elem:", elem);
 
-                    smdgroup.add(line);
-                    //that.sceneAdd(line);
-                    //group.add(line);
 
-                    padCtr++;
+                    /*
+                    if (elem.rot.match(/M/i)) {
+                      var axis = new THREE.Vector3(0, 1, 0);
+                           that.rotateAroundObjectAxis(padgroup, axis, 180);
+                           console.log ("ray: M matched");
 
-                }, this);
-                
-
-                /*
-                if (elem.rot.match(/M/i)) {
-                  var axis = new THREE.Vector3(0, 1, 0);
-                       var r = (Math.PI / 180) * 180;
-                       that.rotateAroundObjectAxis(padgroup, axis, r);
-                       console.log ("ray: M matched");
-
-                }*/
-                //var t = "M270"; console.log( parseInt(t.replace(/\D+/i,'')) )
-
-                // now rotate and position the smdgroup
-                //smdgroup
-                if ('rot' in elem && elem.rot != null) {
-                    //var rot = parseInt(elem.rot.replace(/R/i, ""));
-                    var rot = parseInt(elem.rot.replace(/\D+/i,''));
-
-                    console.log("will rotate pkg smd by deg:", rot);
-                    if (rot > 0) {
-                        var r = (Math.PI / 180) * rot;
-                        //console.log("we are rotating pkg smd by radians:", r);
-                        var axis = new THREE.Vector3(0, 0, 1);
-                        that.rotateAroundObjectAxis(smdgroup, axis, r);
                     }
-                }
-                
-
-                // see if smd group is mirrored
-                //console.log("checking if elem is mirrored. elem:", elem);
+                    */
 
 
-                /*
-                if (elem.rot.match(/M/i)) {
-                  var axis = new THREE.Vector3(0, 1, 0);
-                       that.rotateAroundObjectAxis(padgroup, axis, 180);
-                       console.log ("ray: M matched");
+                    if (elem.mirror) {
+                        //console.log("smdgroup elem is mirrored");
+                        var mS = (new THREE.Matrix4()).identity();
+                        //set -1 to the corresponding axis
+                        mS.elements[0] = -1;
+                        //mS.elements[5] = -1;
+                        //mS.elements[10] = -1;
 
-                }
-                */
+                        smdgroup.applyMatrix(mS);
+                        //mesh.applyMatrix(mS);
+                        //object.applyMatrix(mS);
+                    }
 
-                
-                if (elem.mirror) {
-                    //console.log("smdgroup elem is mirrored");
-                    var mS = (new THREE.Matrix4()).identity();
-                    //set -1 to the corresponding axis
-                    mS.elements[0] = -1;
-                    //mS.elements[5] = -1;
-                    //mS.elements[10] = -1;
-                    
-                    smdgroup.applyMatrix(mS);
-                    //mesh.applyMatrix(mS);
-                    //object.applyMatrix(mS);
-                }
-                
                 } // (if renderThisPad) ends here
-                
+
 
                 // set position
                 smdgroup.position.set(elem.x, elem.y, 0);
                 //that.sceneAdd(smdgroup);
-                bigSceneGroup.add (smdgroup);
-                
+                bigSceneGroup.add(smdgroup);
+
 
                 // store as a clipper path for later union'ing
                 var temparr = [];
@@ -4255,10 +4997,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 elem["threeObj"]["smdsClipperFmt"] = {};
                 smdgroup.updateMatrixWorld();
                 var lineCtr = 0;
-                smdgroup.children.forEach(function (line) {
+                smdgroup.children.forEach(function(line) {
                     //console.log("line in group:", line);
                     temparr[lineCtr] = [];
-                    line.geometry.vertices.forEach(function (v) {
+                    line.geometry.vertices.forEach(function(v) {
                         //line.updateMatrixWorld();
                         //console.log("pushing v onto clipper:", v);
                         var vector = v.clone();
@@ -4274,9 +5016,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             Y: vec.y
                         });
                         elem["threeObj"]["smdsClipperFmt"][line.userData.smd.name] = temparr[lineCtr];
-                        
+
                     }, this);
-                    
+
                     // push onto mondo object, which is sorted by signal name
                     // so we're pushing an smd into an alternate hierarchy
                     var ud = line.userData;
@@ -4296,16 +5038,16 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         threeObj: line,
                         threeObjSmdGroup: smdgroup
                     });
-                    
+
                     lineCtr++;
                 }, this);
-								
+
                 // draw temp union of smd
-                temparr.forEach(function (d) {
+                temparr.forEach(function(d) {
                     this.clipperSmds.push(d);
-                    
+
                 }, this);
-                
+
                 //this.clipperSmds.push(temparr);
                 //console.log("just stored clipperSmds:", this.clipperSmds);
                 /*
@@ -4316,17 +5058,17 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 */
 
                 // CALCULATING PADS
-                
+
                 // do pads
-                
+
                 var padgroup = new THREE.Object3D();
                 elem["threeObj"]["padgroup"] = padgroup;
                 elem["threeObj"]["pads"] = {};
                 elem["threeObj"]["padsAsLines"] = {};
                 elem["threeObj"]["padsAsMesh"] = {};
-                
+
                 //if (renderThisPad) {
-                pkg.pads.forEach(function (pad) {
+                pkg.pads.forEach(function(pad) {
                     console.log("working on pad for layer. pad:", pad, "layer:", layer);
 
 
@@ -4339,7 +5081,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     elem["threeObj"]["padsAsMesh"][pad.name] = null;
 
                     if (pad.shape == "square") {
-                        
+
                         // check if diameter is there. if not create assumption
                         if (pad.diameter == null || isNaN(pad.diameter)) {
                             //console.warn("found pad without diameter. pad:", pad);
@@ -4347,11 +5089,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             if (pad.drill && pad.drill > 0) {
                                 // we have something to base our size on
                                 pad.diameter = pad.drill * 2;
-                            } else {
+                            }
+                            else {
                                 console.error("no way to determine pad size for pad:", pad);
                             }
                         }
-                        
+
                         var lineGeo = new THREE.Geometry();
                         var w = pad.diameter / 2;
 
@@ -4371,7 +5114,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         group.add(line);
 
 
-                    } else if (pad.shape == "octagon") {
+                    }
+                    else if (pad.shape == "octagon") {
 
                         // use circle geometry shortcut, but create only 8 segments
                         //console.log("generating octagon via circle. pad:", pad);
@@ -4383,11 +5127,12 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                             if (pad.drill && pad.drill > 0) {
                                 // we have something to base our size on
                                 pad.diameter = pad.drill * 2;
-                            } else {
+                            }
+                            else {
                                 console.error("no way to determine pad size for pad:", pad);
                             }
                         }
-                        
+
                         var radius = pad.diameter / 2;
                         var segments = 8; // not 1 extra for center vertex
                         var material = new THREE.LineBasicMaterial({
@@ -4405,7 +5150,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         group.add(lineCircle);
 
 
-                    } else if (pad.shape == "long") {
+                    }
+                    else if (pad.shape == "long") {
 
                         //debugger;
                         // the long pad height is 3x diameter of drill
@@ -4465,7 +5211,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         //group.position.set(pad.x, pad.y, 0);
                         group.add(line);
 
-                    } else {
+                    }
+                    else {
                         //console.log("generating circle. pad:", pad);
 
                         if (isNaN(pad.diameter)) {
@@ -4538,10 +5285,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     padgroup.add(group);
 
                 });
-                
+
 
                 // now position the pads for the element's pos, mirror, and rotation
-                
+
                 // see if padgroup rotated
                 if (elem.rot.match(/R(\d+)/i)) {
                     // there is a rotation
@@ -4555,7 +5302,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         that.rotateAroundObjectAxis(padgroup, axis, r);
                     }
                 }
-                
+
 
                 // see if pad group is mirrored
                 //console.log("checking if pad elem is mirrored. elem:", elem);
@@ -4566,30 +5313,30 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     mS.elements[0] = -1;
                     //mS.elements[5] = -1;
                     //mS.elements[10] = -1;
-                    
+
                     padgroup.applyMatrix(mS);
                     //mesh.applyMatrix(mS);
                     //object.applyMatrix(mS);
                 }
                 //} // (if renderThisPad) ends here
 
-                
+
                 // set padgroup's x/y
                 padgroup.position.set(elem.x, elem.y, 0);
                 //that.sceneAdd(padgroup);
-                
+
                 // Now convert the Three.js drawn padgroup to a Clipper path
                 // so we can do cool stuff like inflate/deflate and union/intersect
                 // it. To convert we need to updateMatrixWorld() for three.js to calculate
                 // all the absolute coordinates for us.
-                
+
                 // add to Clipper list for later union'ing
                 //console.log("group vertices:", padgroup);
                 padgroup.updateMatrixWorld();
                 var temparr = [];
                 var padCtr = 0;
                 var lineCtr = 0;
-                padgroup.children.forEach(function (group) {
+                padgroup.children.forEach(function(group) {
                     group.updateMatrixWorld();
 
                     // store the vertices into this mesh
@@ -4599,7 +5346,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var meshHoleArr = [];
                     var meshCtr = 0;
 
-                    group.children.forEach(function (line) {
+                    group.children.forEach(function(line) {
+
                         //console.log("line in group:", line);
                         temparr[lineCtr] = [];
                         var firstMeshPt = null;
@@ -4608,54 +5356,115 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                         // Get absolute coordinates from drill hole
                         // in an element
-                        if( line.position.x == 0 ){ // only middle point holes
-                           var vector = new THREE.Vector3();
-                           vector.setFromMatrixPosition( line.matrixWorld  );
-                           // Most exists only drills with diameter 1.0 0.9 0.8 ...
-                           var drill = line.parent.userData.pad.drill;
-                           var shape = line.parent.userData.pad.shape;
-                           if(this.drillPads[drill.toFixed(1)] === undefined)
-                               this.drillPads[drill.toFixed(1)] = [];
-                           this.drillPads[drill.toFixed(1)].push({
-                               X: vector.x.toFixed(4),
-                               Y: vector.y.toFixed(4),
-                               D: drill.toFixed(4)
-                           });
-                           // New routine to draw a cirlce in threed
-                           //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
-                           bigSceneGroup.add (this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
+                        if (line.position.x == 0) {
 
-                           // drill hole --> end
-                         }
-                        
-                        line.geometry.vertices.forEach(function (v) {
-                            //console.log("pushing v onto clipper:", v);
-                            var vector = v.clone();
-                            //vector.applyMatrix( group.matrixWorld );
-                            var vec = line.localToWorld(vector);
-                            if (!(elemKey + "-" + lineCtr in this.clipperElements)) 
-                              this.clipperElements[elemKey + "-" + lineCtr] = [];
+                            if (layerName == "Bottom") {
+                                // only middle point holes
+                                var vector = new THREE.Vector3();
+                                vector.setFromMatrixPosition(line.matrixWorld);
+                                // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                                var drill = line.parent.userData.pad.drill;
+                                var shape = line.parent.userData.pad.shape;
+                                if (this.drillPads[drill.toFixed(1)] === undefined)
+                                    this.drillPads[drill.toFixed(1)] = [];
+                                this.drillPads[drill.toFixed(1)].push({
+                                    X: -(vector.x.toFixed(4)),
+                                    Y: vector.y.toFixed(4),
+                                    D: drill.toFixed(4)
+                                });
+                                // New routine to draw a cirlce in threed
+                                //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
+                                bigSceneGroup.add(this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
+                                // drill hole --> end
+                            }
+                            else {
+                                // only middle point holes
+                                var vector = new THREE.Vector3();
+                                vector.setFromMatrixPosition(line.matrixWorld);
+                                // Most exists only drills with diameter 1.0 0.9 0.8 ...
+                                var drill = line.parent.userData.pad.drill;
+                                var shape = line.parent.userData.pad.shape;
+                                if (this.drillPads[drill.toFixed(1)] === undefined)
+                                    this.drillPads[drill.toFixed(1)] = [];
+                                this.drillPads[drill.toFixed(1)].push({
+                                    X: (vector.x.toFixed(4)),
+                                    Y: vector.y.toFixed(4),
+                                    D: drill.toFixed(4)
+                                });
+                                // New routine to draw a cirlce in threed
+                                //this.sceneAdd( this.drawCircle(vector.x, vector.y, drill/2, this.colorHole ) );
+                                bigSceneGroup.add(this.drawCircle(vector.x, vector.y, drill / 2, this.colorHole));
 
-                            this.clipperElements[elemKey + "-" + lineCtr].push({
-                                X: vec.x,
-                                Y: vec.y
-                            });
-                            temparr[lineCtr].push({
-                                X: vec.x,
-                                Y: vec.y
-                            });
-                            //elem["threeObj"]["pads"]
-                            var ptxy = {
-                                X: vec.x,
-                                Y: vec.y
-                            };
-                            if (line.userData.type == "drill") {
+                                // drill hole --> end
+                            }
+                        }
 
-                                meshHoleArr.push(ptxy);
-                                if (firstMeshHolePt == null) firstMeshHolePt = ptxy;
-                            } else {
-                                meshArr[meshCtr].push(ptxy);
-                                if (firstMeshPt == null) firstMeshPt = ptxy;
+
+                        // SEB pads mirroring
+                        line.geometry.vertices.forEach(function(v) {
+
+                            if (layerName == "Bottom") {
+                                //console.log("pushing v onto clipper:", v);
+                                var vector = v.clone();
+                                //vector.applyMatrix( group.matrixWorld );
+                                var vec = line.localToWorld(vector);
+                                if (!(elemKey + "-" + lineCtr in this.clipperElements))
+                                    this.clipperElements[elemKey + "-" + lineCtr] = [];
+
+                                this.clipperElements[elemKey + "-" + lineCtr].push({
+                                    X: -vec.x,
+                                    Y: vec.y
+                                });
+                                temparr[lineCtr].push({
+                                    X: -vec.x,
+                                    Y: vec.y
+                                });
+                                //elem["threeObj"]["pads"]
+                                var ptxy = {
+                                    X: -vec.x,
+                                    Y: vec.y
+                                };
+                                if (line.userData.type == "drill") {
+
+                                    meshHoleArr.push(ptxy);
+                                    if (firstMeshHolePt == null) firstMeshHolePt = ptxy;
+                                }
+                                else {
+                                    meshArr[meshCtr].push(ptxy);
+                                    if (firstMeshPt == null) firstMeshPt = ptxy;
+                                }
+                            }
+                            else {
+                                //console.log("pushing v onto clipper:", v);
+                                var vector = v.clone();
+                                //vector.applyMatrix( group.matrixWorld );
+                                var vec = line.localToWorld(vector);
+                                if (!(elemKey + "-" + lineCtr in this.clipperElements))
+                                    this.clipperElements[elemKey + "-" + lineCtr] = [];
+
+                                this.clipperElements[elemKey + "-" + lineCtr].push({
+                                    X: vec.x,
+                                    Y: vec.y
+                                });
+                                temparr[lineCtr].push({
+                                    X: vec.x,
+                                    Y: vec.y
+                                });
+                                //elem["threeObj"]["pads"]
+                                var ptxy = {
+                                    X: vec.x,
+                                    Y: vec.y
+                                };
+                                if (line.userData.type == "drill") {
+
+                                    meshHoleArr.push(ptxy);
+                                    if (firstMeshHolePt == null) firstMeshHolePt = ptxy;
+                                }
+                                else {
+                                    meshArr[meshCtr].push(ptxy);
+                                    if (firstMeshPt == null) firstMeshPt = ptxy;
+                                }
+
                             }
                         }, this);
                         meshCtr++;
@@ -4668,7 +5477,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                     //console.log("creating pad mesh for pad:");
                     var shape = new THREE.Shape();
-                    
+
                     // create a mesh for each group
                     //var lineGeo = new THREE.Geometry();
                     // we need to union the mesh first cuz it
@@ -4677,7 +5486,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     var clipperOuterPath = sol_paths[0];
                     //console.log("unionized mesh pts for meshArr:", sol_paths);
                     var ptCtr = 0;
-                    sol_paths[0].forEach(function (pt) {
+                    sol_paths[0].forEach(function(pt) {
                         if (ptCtr == 0) shape.moveTo(pt.X, pt.Y);
                         else shape.lineTo(pt.X, pt.Y);
                         //lineGeo.vertices.push(new THREE.Vector3(pt.X, pt.Y, 0));
@@ -4706,7 +5515,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         //console.log("unionized mesh pts for meshHoleArr:", sol_paths);
                         var ptCtr = 0;
                         //var revArr = sol_paths[0].reverse();
-                        sol_paths[0].forEach(function (pt) {
+                        sol_paths[0].forEach(function(pt) {
                             //holeGeo.vertices.push(new THREE.Vector3(pt.X, pt.Y, 0));
                             if (ptCtr == 0) hole.moveTo(pt.X, pt.Y);
                             else hole.lineTo(pt.X, pt.Y);
@@ -4747,10 +5556,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     */
 
                     // using shape instead
-                    var geometry = new THREE.ShapeGeometry( shape );
+                    var geometry = new THREE.ShapeGeometry(shape);
                     //var material = new THREE.MeshBasicMaterial({color:0xffccff, side:2, overdraw:true} );
-                    var mesh = new THREE.Mesh(geometry, meshMat );
-                    
+                    var mesh = new THREE.Mesh(geometry, meshMat);
+
                     // we now have a mesh representation of this
                     // pad. let's save it for later use.
                     //console.log("done working on pad mesh:", mesh);
@@ -4759,10 +5568,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     mesh.userData["elem"] = group.userData.elem;
                     mesh.userData["pkg"] = group.userData.pkg;
                     mesh.userData["pad"] = group.userData.pad;
-                    
-                    bigSceneGroup.add (mesh);
+
+                    bigSceneGroup.add(mesh);
                     //this.sceneAdd(mesh);
-                    
+
                     // add that these get detected during
                     // mouseover
                     this.intersectObjects.push(mesh);
@@ -4782,11 +5591,11 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                         threeObj: mesh,
                         threeObjPadGroup: padgroup
                     });
-                    
+
                 }, this);
 
                 // draw temp union of padgroup
-                temparr.forEach(function (d) {
+                temparr.forEach(function(d) {
                     this.clipperPads.push(d);
                 }, this);
                 /*
@@ -4798,7 +5607,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
                 // so far wires in a pkg are for tPlace and tDocu, not
                 // for milling, so not an important part to solve
-                pkg.wires.forEach(function (wire) {
+                pkg.wires.forEach(function(wire) {
                     var layerNum = wire.layer;
 
                     if (elem.mirror) {
@@ -4828,7 +5637,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     });
                     var line = new THREE.Line(lineGeo, lineMat);
                     //that.sceneAdd(line);
-                    bigSceneGroup.add (line); 
+                    bigSceneGroup.add(line);
 
                 }, this);
 
@@ -4877,7 +5686,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 }
                 */
             }
-            
+
             var rFlip = (Math.PI / 180) * 180;
             var axisFlip = new THREE.Vector3(0, 1, 0);
             if (this.activeLayer == 'Bottom' && this.flipTheBoard == true) { //If bottom layer flip board
@@ -4887,8 +5696,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             } //Elements flip code
 
             that.sceneAdd(bigSceneGroup);
-            
-            
+
+
             console.log("final list of clipper elements:", this.clipperElements);
             console.log("this.eagle.elements with all threeObjs and clipperPaths", this.eagle.elements);
             console.log("this.clipperBySignalKey", this.clipperBySignalKey);
@@ -4897,7 +5706,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
         },
         // Rotate an object around an arbitrary axis in object space
         rotObjectMatrix: null,
-        rotateAroundObjectAxis: function (object, axis, radians) {
+        rotateAroundObjectAxis: function(object, axis, radians) {
             rotObjectMatrix = new THREE.Matrix4();
             rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
 
@@ -4916,7 +5725,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
         rotWorldMatrix: null,
         // Rotate an object around an arbitrary axis in world space       
-        rotateAroundWorldAxis: function (object, axis, radians) {
+        rotateAroundWorldAxis: function(object, axis, radians) {
             rotWorldMatrix = new THREE.Matrix4();
             rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
 
@@ -4934,36 +5743,38 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // code for r59+:
             object.rotation.setFromRotationMatrix(object.matrix);
         },
-        drawCircle: function (x, y, radius, color){
+        drawCircle: function(x, y, radius, color) {
             // draw a hole
             var segments = 32,
-                material = new THREE.LineBasicMaterial( { color: color } ),
-                geometry = new THREE.CircleGeometry( radius, segments );
+                material = new THREE.LineBasicMaterial({
+                    color: color
+                }),
+                geometry = new THREE.CircleGeometry(radius, segments);
             // Remove center vertex
             geometry.vertices.shift();
 
-            var circle = new THREE.Line( geometry, material );
+            var circle = new THREE.Line(geometry, material);
             circle.position.set(x, y, 0);
 
             return circle;
         },
-        drawSphere: function (x, y, radius, color){
+        drawSphere: function(x, y, radius, color) {
             console.log("Sqhere position and color: ", x, y, color);
             var segments = 16;
-            var material = new THREE.MeshBasicMaterial( { 
-                     color: color,
-                     wireframe : false,
-                     transparent: true,
-                     opacity: 0.5
-                  } ),
-                geometry = new THREE.SphereGeometry( radius, segments, segments, 0, Math.PI*2, 0, Math.PI/2); // HalfSphere
-             
-            var mesh = new THREE.Mesh( geometry, material ) ;
+            var material = new THREE.MeshBasicMaterial({
+                    color: color,
+                    wireframe: false,
+                    transparent: true,
+                    opacity: 0.5
+                }),
+                geometry = new THREE.SphereGeometry(radius, segments, segments, 0, Math.PI * 2, 0, Math.PI / 2); // HalfSphere
+
+            var mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(x, y, 0);
             mesh.rotateX(Math.PI / 2); // 90 degrees
             return mesh;
         },
-        drawSquare: function (x1, y1, x2, y2) {
+        drawSquare: function(x1, y1, x2, y2) {
 
             var square = new THREE.Geometry();
 
@@ -4995,14 +5806,14 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
             this.obj3dmeta.widget.wakeAnimate();
         },
-        sceneAdd: function (obj) {
+        sceneAdd: function(obj) {
             //chilipeppr.publish("/com-chilipeppr-widget-3dviewer/sceneadd", obj);
-            
+
             // this method of adding puts us in the object that contains rendered Gcode
             // that's one option, but when we send gcode to workspace we get overwritten
             // then
             //this.obj3d.add(obj);
-            
+
             // let's add our Eagle BRD content outside the scope of the Gcode content
             // so that we have it stay while the Gcode 3D Viewer still functions
             if (this.mySceneGroup == null) {
@@ -5011,10 +5822,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
             this.mySceneGroup.add(obj);
             //this.obj3dmeta.scene.add(obj);
-            
+
             this.obj3dmeta.widget.wakeAnimate();
         },
-        sceneRemove: function (obj) {
+        sceneRemove: function(obj) {
             //chilipeppr.publish("/com-chilipeppr-widget-3dviewer/sceneremove", obj);
             //this.obj3d.remove(obj);
             //this.obj3dmeta.scene.remove(obj);
@@ -5022,10 +5833,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 this.mySceneGroup.remove(obj);
             this.obj3dmeta.widget.wakeAnimate();
         },
-        draw: function (e) {
+        draw: function(e) {
             this.eagle.draw();
         },
-        onDropped: function (data, info) {
+        onDropped: function(data, info) {
             console.log("onDropped. len of file:", data.length, "info:", info);
             // we have the data
             // double check it's a board file, cuz it could be gcode
@@ -5041,7 +5852,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                     this.fileInfo = info;
                     console.log("saved brd file to localstorage");
                     this.open(data, info);
-                } else {
+                }
+                else {
                     console.log("looks like it is an eagle generated file, but not a board file. sad.");
                     chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', "Looks like you dragged in an Eagle CAD file, but it contains no board tag. You may have dragged in a schematic instead. Please retry with a valid board file.");
                 }
@@ -5050,30 +5862,32 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
                 // drag/drop event because they won't know how to handle
                 // an Eagle Brd file
                 return false;
-            } else {
+            }
+            else {
                 if (info.name.match(/.brd$/i)) {
                     // this looks like an Eagle brd file, but it's binary
                     chilipeppr.publish('/com-chilipeppr-elem-flashmsg/flashmsg', "Error Loading Eagle BRD File", "Looks like you dragged in an Eagle BRD file, but it seems to be in binary. You can open this file in Eagle and then re-save it to a new file to create a text version of your Eagle BRD file.", 15 * 1000);
                     return false;
-                } else {
+                }
+                else {
                     console.log("we do not have an eagle board file. sad.");
                 }
             }
         },
-        onDragOver: function () {
+        onDragOver: function() {
             console.log("onDragOver");
             $('#com-chilipeppr-widget-eagle').addClass("panel-primary");
         },
-        onDragLeave: function () {
+        onDragLeave: function() {
             console.log("onDragLeave");
             $('#com-chilipeppr-widget-eagle').removeClass("panel-primary");
         },
         isVidLoaded: false,
-        lazyLoadTutorial: function () {
+        lazyLoadTutorial: function() {
             // lazy load tutorial tab youtube vid
             //var isVidLoaded = false;
             var that = this;
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
                 //e.target // activated tab
                 console.log("tab activated. e.target:", $(e.target));
                 if ($(e.target).text() == 'Tutorial') {
@@ -5090,14 +5904,15 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
         },
         options: null,
-        setupUiFromLocalStorage: function () {
+        setupUiFromLocalStorage: function() {
             // read vals from cookies
             var options = localStorage.getItem('com-chilipeppr-widget-eagle-options');
 
             if (options) {
                 options = $.parseJSON(options);
                 console.log("just evaled options: ", options);
-            } else {
+            }
+            else {
                 options = {
                     showBody: true,
                     port: null,
@@ -5111,12 +5926,13 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // show/hide body
             if (options.showBody) {
                 this.showBody();
-            } else {
+            }
+            else {
                 this.hideBody();
             }
 
         },
-        saveOptionsLocalStorage: function () {
+        saveOptionsLocalStorage: function() {
             //var options = {
             //    showBody: this.options.showBody
             //};
@@ -5127,7 +5943,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             // store cookie
             localStorage.setItem('com-chilipeppr-widget-eagle-options', optionsStr);
         },
-        showBody: function (evt) {
+        showBody: function(evt) {
             $('#com-chilipeppr-widget-eagle .panel-body').removeClass('hidden');
             //$('#com-chilipeppr-widget-eagle .panel-footer').removeClass('hidden');
             $('#com-chilipeppr-widget-eagle .hidebody span').addClass('glyphicon-chevron-up');
@@ -5138,7 +5954,7 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
             $(window).trigger('resize');
         },
-        hideBody: function (evt) {
+        hideBody: function(evt) {
             $('#com-chilipeppr-widget-eagle .panel-body').addClass('hidden');
             //$('#com-chilipeppr-widget-eagle .panel-footer').addClass('hidden');
             $('#com-chilipeppr-widget-eagle .hidebody span').removeClass('glyphicon-chevron-up');
@@ -5149,16 +5965,17 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
             $(window).trigger('resize');
         },
-        btnSetup: function () {
+        btnSetup: function() {
 
             // chevron hide body
             var that = this;
-            $('#com-chilipeppr-widget-eagle .hidebody').click(function (evt) {
+            $('#com-chilipeppr-widget-eagle .hidebody').click(function(evt) {
                 console.log("hide/unhide body");
                 if ($('#com-chilipeppr-widget-eagle .panel-body').hasClass('hidden')) {
                     // it's hidden, unhide
                     that.showBody(evt);
-                } else {
+                }
+                else {
                     // hide
                     that.hideBody(evt);
                 }
@@ -5174,10 +5991,10 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 
             // refresh btn
             $('#com-chilipeppr-widget-eagle .btn-refresh').click(this.onRefresh.bind(this));
-            
+
         },
         statusEl: null, // cache the status element in DOM
-        status: function (txt) {
+        status: function(txt) {
             console.log("status. txt:", txt);
             if (this.statusEl == null) this.statusEl = $('#com-chilipeppr-widget-eagle-status');
             var len = this.statusEl.val().length;
@@ -5187,9 +6004,9 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             }
             this.statusEl.val(this.statusEl.val() + txt + "\n");
             this.statusEl.scrollTop(
-            this.statusEl[0].scrollHeight - this.statusEl.height());
+                this.statusEl[0].scrollHeight - this.statusEl.height());
         },
-        forkSetup: function () {
+        forkSetup: function() {
             var topCssSelector = '#com-chilipeppr-widget-eagle';
 
             $(topCssSelector + ' .panel-title').popover({
@@ -5203,8 +6020,8 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
             });
 
             var that = this;
-            chilipeppr.load("http://fiddle.jshell.net/chilipeppr/zMbL9/show/light/", function () {
-                require(['inline:com-chilipeppr-elem-pubsubviewer'], function (pubsubviewer) {
+            chilipeppr.load("http://fiddle.jshell.net/chilipeppr/zMbL9/show/light/", function() {
+                require(['inline:com-chilipeppr-elem-pubsubviewer'], function(pubsubviewer) {
                     pubsubviewer.attachTo($('#com-chilipeppr-widget-eagle .panel-heading .dropdown-menu'), that);
                 });
             });
@@ -5214,24 +6031,25 @@ cpdefine("inline:com-chilipeppr-widget-eagle", ["chilipeppr_ready", "Clipper", "
 });
 
 
-var p = function (o) {
-    console.log(o)
-}
-// -----------------------
-// --- ENUMS, DEFAULTS ---
-// -----------------------
+var p = function(o) {
+        console.log(o)
+    }
+    // -----------------------
+    // --- ENUMS, DEFAULTS ---
+    // -----------------------
 
 EagleCanvas.LayerId = {
     'BOTTOM_COPPER': 1,
-        'BOTTOM_SILKSCREEN': 2,
-        'BOTTOM_DOCUMENTATION': 3,
-        'DIM_BOARD': 4,
-        'TOP_COPPER': 5,
-        'TOP_SILKSCREEN': 6,
-        'TOP_DOCUMENTATION': 7,
-        'VIAS': 8,
-        'OUTLINE': 9,
-        'PADS': 10
+    'BOTTOM_SILKSCREEN': 2,
+    'BOTTOM_DOCUMENTATION': 3,
+    'DIM_BOARD': 4,
+    'TOP_COPPER': 5,
+    'TOP_SILKSCREEN': 6,
+    'TOP_DOCUMENTATION': 7,
+    'VIAS': 8,
+    'OUTLINE': 9,
+    'PADS': 10,
+    'HOLES': 11
 }
 
 EagleCanvas.LARGE_NUMBER = 99999;
@@ -5253,6 +6071,7 @@ function EagleCanvas(canvasId) {
     this.visibleLayers[EagleCanvas.LayerId.TOP_DOCUMENTATION] = true;
     this.visibleLayers[EagleCanvas.LayerId.VIAS] = true;
     //this.visibleLayers[EagleCanvas.LayerId.PADS]                 = true;
+    this.visibleLayers[EagleCanvas.LayerId.HOLES] = true;
     this.visibleLayers[EagleCanvas.LayerId.OUTLINE] = true;
 
     this.renderLayerOrder = [];
@@ -5264,6 +6083,7 @@ function EagleCanvas(canvasId) {
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_COPPER);
     this.renderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     //this.renderLayerOrder.push(EagleCanvas.LayerId.PADS);
+    this.renderLayerOrder.push(EagleCanvas.LayerId.HOLES);
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_SILKSCREEN);
     this.renderLayerOrder.push(EagleCanvas.LayerId.TOP_DOCUMENTATION);
 
@@ -5275,62 +6095,69 @@ function EagleCanvas(canvasId) {
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.OUTLINE);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_COPPER);
     //this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.PADS);
+    this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.HOLES);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.VIAS);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_SILKSCREEN);
     this.reverseRenderLayerOrder.push(EagleCanvas.LayerId.BOTTOM_DOCUMENTATION);
 
     this.layerRenderFunctions = {};
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_COPPER] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_COPPER] = function(that, ctx) {
         that.drawSignalWires(that.eagleLayersByName['Bottom'], ctx);
         that.drawElements(that.eagleLayersByName['Bottom'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_SILKSCREEN] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_SILKSCREEN] = function(that, ctx) {
         that.drawElements(that.eagleLayersByName['bNames'], ctx);
         that.drawElements(that.eagleLayersByName['bValues'], ctx);
         that.drawElements(that.eagleLayersByName['bPlace'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_DOCUMENTATION] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_DOCUMENTATION] = function(that, ctx) {
         that.drawElements(that.eagleLayersByName['bKeepout'], ctx);
         that.drawElements(that.eagleLayersByName['bDocu'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_COPPER] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_COPPER] = function(that, ctx) {
         that.drawSignalWires(that.eagleLayersByName['Top'], ctx);
         that.drawElements(that.eagleLayersByName['Top'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_SILKSCREEN] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_SILKSCREEN] = function(that, ctx) {
         that.drawElements(that.eagleLayersByName['tNames'], ctx);
         that.drawElements(that.eagleLayersByName['tValues'], ctx);
         that.drawElements(that.eagleLayersByName['tPlace'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_DOCUMENTATION] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.TOP_DOCUMENTATION] = function(that, ctx) {
         that.drawElements(that.eagleLayersByName['tKeepout'], ctx);
         that.drawElements(that.eagleLayersByName['tDocu'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.DIM_BOARD] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.DIM_BOARD] = function(that, ctx) {
         that.dimCanvas(ctx, that.dimBoardAlpha);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.VIAS] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.VIAS] = function(that, ctx) {
         that.drawSignalVias('1-16', ctx, '#0b0');
         //that.drawSignalVias('18-18',ctx, '#0b0');
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.PADS] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.PADS] = function(that, ctx) {
         that.drawPads(ctx, '#0b0');
     }
+    
+    this.layerRenderFunctions[EagleCanvas.LayerId.HOLES] = function(that, ctx) {
+        that.drawElements(that.eagleLayersByName['Holes'], ctx);
+        that.drawSignalWires(that.eagleLayersByName['Holes'], ctx);
+        that.drawPlainWires(that.eagleLayersByName['Holes'], ctx);
+    }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.OUTLINE] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.OUTLINE] = function(that, ctx) {
         that.drawPlainWires(that.eagleLayersByName['Dimension'], ctx);
     }
 
-    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_COPPER] = function (that, ctx) {
+    this.layerRenderFunctions[EagleCanvas.LayerId.BOTTOM_COPPER] = function(that, ctx) {
         that.drawSignalWires(that.eagleLayersByName['Bottom'], ctx);
         that.drawElements(that.eagleLayersByName['Bottom'], ctx);
     }
@@ -5342,7 +6169,7 @@ function EagleCanvas(canvasId) {
 // --- LOADING ---
 // ---------------
 
-EagleCanvas.prototype.loadURL = function (url, cb) {
+EagleCanvas.prototype.loadURL = function(url, cb) {
     this.url = url;
     var request = new XMLHttpRequest(),
         self = this;
@@ -5353,7 +6180,7 @@ EagleCanvas.prototype.loadURL = function (url, cb) {
     this.url = this.url.replace(/\/\/chilipeppr.com/, "//i2dcui.appspot.com");
 
     request.open('GET', this.url, true);
-    request.onreadystatechange = function () {
+    request.onreadystatechange = function() {
         if (request.readyState == 4) {
             self.loadText(request.responseText);
             cb(self)
@@ -5362,7 +6189,7 @@ EagleCanvas.prototype.loadURL = function (url, cb) {
     request.send(null);
 };
 
-EagleCanvas.prototype.loadText = function (text) {
+EagleCanvas.prototype.loadText = function(text) {
     this.text = text;
     var parser = new DOMParser();
     this.boardXML = parser.parseFromString(this.text, "text/xml");
@@ -5376,7 +6203,7 @@ EagleCanvas.prototype.loadText = function (text) {
 // --- PARSING ---
 // ---------------
 
-EagleCanvas.prototype.parse = function () {
+EagleCanvas.prototype.parse = function() {
     console.group("Eagle Parse");
     // store by eagle name
     this.eagleLayersByName = {};
@@ -5395,6 +6222,13 @@ EagleCanvas.prototype.parse = function () {
     for (var elementIdx = 0; elementIdx < elements.length; elementIdx++) {
         var elemDict = this.parseElement(elements[elementIdx])
         this.elements[elemDict.name] = elemDict;
+    }
+
+    this.holes = {};
+    var holes = this.boardXML.getElementsByTagName('hole');
+    for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
+        var holeDict = this.parseElement(holes[holeIdx])
+        this.holes[holeDict.name] = holeDict;
     }
 
     this.signalItems = {};
@@ -5448,7 +6282,7 @@ EagleCanvas.prototype.parse = function () {
                 }
             }
         }
-        
+
         // Get polygon pours
         var polygons = signal.getElementsByTagName('polygon');
         if (polygons.length > 0)
@@ -5456,7 +6290,7 @@ EagleCanvas.prototype.parse = function () {
         for (var polyIdx = 0; polyIdx < polygons.length; polyIdx++) {
             var polygon = polygons[polyIdx];
             var polyDict = this.parsePoly(polygon);
-            
+
             // push this polygon to the layer array, and then the polygons group for
             // that layer
             var layer = polyDict.layer;
@@ -5531,14 +6365,22 @@ EagleCanvas.prototype.parse = function () {
             var text = texts[textIdx];
             packageTexts.push(this.parseText(text));
         }
+        
+        var packageHoles = [];
+        var holes = pkg.getElementsByTagName('hole');
+        for (var holeIdx = 0; holeIdx < holes.length; holeIdx++) {
+            var hole = holes[holeIdx];
+            packageHoles.push(this.parseHole(hole));
+        }
 
         var packageDict = {
             'pads': packagePads,
             'smds': packageSmds,
             'wires': packageWires,
-                'texts': packageTexts,
+            'texts': packageTexts,
             'bbox': bbox,
-            'name' : packageName
+            'name': packageName,
+            'holes': packageHoles
         };
         this.packagesByName[packageName] = packageDict;
     }
@@ -5561,7 +6403,7 @@ EagleCanvas.prototype.parse = function () {
     console.groupEnd();
 }
 
-EagleCanvas.prototype.parseSmd = function (smd) {
+EagleCanvas.prototype.parseSmd = function(smd) {
     var smdX = parseFloat(smd.getAttribute('x')),
         smdY = parseFloat(smd.getAttribute('y')),
         smdDX = parseFloat(smd.getAttribute('dx')),
@@ -5582,7 +6424,7 @@ EagleCanvas.prototype.parseSmd = function (smd) {
     };
 }
 
-EagleCanvas.prototype.parseVia = function (via) {
+EagleCanvas.prototype.parseVia = function(via) {
     return {
         'x': parseFloat(via.getAttribute('x')),
         'y': parseFloat(via.getAttribute('y')),
@@ -5592,7 +6434,7 @@ EagleCanvas.prototype.parseVia = function (via) {
     };
 }
 
-EagleCanvas.prototype.parsePad = function (pad) {
+EagleCanvas.prototype.parsePad = function(pad) {
     // put pads in Top and Bottom layer artificially
     return {
         'x': parseFloat(pad.getAttribute('x')),
@@ -5605,7 +6447,43 @@ EagleCanvas.prototype.parsePad = function (pad) {
     };
 }
 
-EagleCanvas.prototype.parseWire = function (wire) {
+EagleCanvas.prototype.parseWire = function(wire) {
+    var width = parseFloat(wire.getAttribute('width'));
+    if (width <= 0.0) width = this.minLineWidth;
+    var layerName = this.activeLayer;
+    if (layerName == "Bottom") {
+        return {
+            'x1': -(parseFloat(wire.getAttribute('x1'))),
+            'y1': parseFloat(wire.getAttribute('y1')),
+            'x2': -(parseFloat(wire.getAttribute('x2'))),
+            'y2': parseFloat(wire.getAttribute('y2')),
+            'width': width,
+            'layer': parseInt(wire.getAttribute('layer'))
+        };
+    }
+    else {
+        return {
+            'x1': parseFloat(wire.getAttribute('x1')),
+            'y1': parseFloat(wire.getAttribute('y1')),
+            'x2': parseFloat(wire.getAttribute('x2')),
+            'y2': parseFloat(wire.getAttribute('y2')),
+            'width': width,
+            'layer': parseInt(wire.getAttribute('layer'))
+        };
+    }
+}
+
+EagleCanvas.prototype.parseHole = function(hole) {
+    return {
+        'x': parseFloat(hole.getAttribute('x')),
+        'y': parseFloat(hole.getAttribute('y')),
+        'drill': parseFloat(hole.getAttribute('drill')),
+//        'name': hole.getAttribute('name')
+    };
+}
+
+// ORIG
+/*EagleCanvas.prototype.parseWire = function (wire) {
     var width = parseFloat(wire.getAttribute('width'));
     if (width <= 0.0) width = this.minLineWidth;
 
@@ -5618,8 +6496,9 @@ EagleCanvas.prototype.parseWire = function (wire) {
             'layer': parseInt(wire.getAttribute('layer'))
     };
 }
+*/
 
-EagleCanvas.prototype.parsePoly = function (poly) {
+EagleCanvas.prototype.parsePoly = function(poly) {
     var width = parseFloat(poly.getAttribute('width'));
     if (width <= 0.0) width = this.minLineWidth;
 
@@ -5643,7 +6522,7 @@ EagleCanvas.prototype.parsePoly = function (poly) {
         };
         vertices.push(vertex);
     }
-    
+
     return {
         'width': width,
         'layer': parseInt(poly.getAttribute('layer')),
@@ -5654,25 +6533,25 @@ EagleCanvas.prototype.parsePoly = function (poly) {
     };
 }
 
-EagleCanvas.prototype.parseText = function (text) {
+EagleCanvas.prototype.parseText = function(text) {
     var content = text.textContent;
     if (!content) content = "";
     return {
         'x': parseFloat(text.getAttribute('x')),
-            'y': parseFloat(text.getAttribute('y')),
-            'size': parseFloat(text.getAttribute('size')),
-            'layer': parseInt(text.getAttribute('layer')),
-            'font': text.getAttribute('font'),
-            'content': content
+        'y': parseFloat(text.getAttribute('y')),
+        'size': parseFloat(text.getAttribute('size')),
+        'layer': parseInt(text.getAttribute('layer')),
+        'font': text.getAttribute('font'),
+        'content': content
     };
 }
 
-EagleCanvas.prototype.parseElement = function (elem) {
+EagleCanvas.prototype.parseElement = function(elem) {
     var elemRot = elem.getAttribute('rot') || "R0",
         elemMatrix = this.matrixForRot(elemRot);
 
     var attribs = {},
-    elemAttribs = elem.getElementsByTagName('attribute');
+        elemAttribs = elem.getElementsByTagName('attribute');
     for (var attribIdx = 0; attribIdx < elemAttribs.length; attribIdx++) {
 
         var elemAttrib = elemAttribs[attribIdx],
@@ -5714,24 +6593,24 @@ EagleCanvas.prototype.parseElement = function (elem) {
 
     return {
         'pkg': elem.getAttribute('package'),
-            'name': elem.getAttribute('name'),
-            'value': elem.getAttribute('value'),
-            'x': parseFloat(elem.getAttribute('x')),
-            'y': parseFloat(elem.getAttribute('y')),
-            'rot': elemRot,
-            'matrix': elemMatrix,
-            'mirror': elemRot.indexOf('M') == 0,
-            'smashed': elem.getAttribute('smashed') && (elem.getAttribute('smashed').toUpperCase() == 'YES'),
-            'attributes': attribs,
-            'padSignals': {} //to be filled later
+        'name': elem.getAttribute('name'),
+        'value': elem.getAttribute('value'),
+        'x': parseFloat(elem.getAttribute('x')),
+        'y': parseFloat(elem.getAttribute('y')),
+        'rot': elemRot,
+        'matrix': elemMatrix,
+        'mirror': elemRot.indexOf('M') == 0,
+        'smashed': elem.getAttribute('smashed') && (elem.getAttribute('smashed').toUpperCase() == 'YES'),
+        'attributes': attribs,
+        'padSignals': {} //to be filled later
     };
 };
 
-EagleCanvas.prototype.parseLayer = function (layer) {
+EagleCanvas.prototype.parseLayer = function(layer) {
     return {
         'name': layer.getAttribute('name'),
-            'number': parseInt(layer.getAttribute('number')),
-            'color': parseInt(layer.getAttribute('color'))
+        'number': parseInt(layer.getAttribute('number')),
+        'color': parseInt(layer.getAttribute('color'))
     };
 }
 
@@ -5758,12 +6637,12 @@ EagleCanvas.prototype.colorPalette = [
     [180, 180, 180]
 ];
 
-EagleCanvas.prototype.layerColor = function (colorIdx) {
+EagleCanvas.prototype.layerColor = function(colorIdx) {
     var rgb = this.colorPalette[colorIdx];
     return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
 }
 
-EagleCanvas.prototype.matrixForRot = function (rot) {
+EagleCanvas.prototype.matrixForRot = function(rot) {
     var flipped = (rot.indexOf('M') == 0),
         degreeString = rot.substring(flipped ? 2 : 1),
         degrees = parseFloat(degreeString),
@@ -5773,10 +6652,11 @@ EagleCanvas.prototype.matrixForRot = function (rot) {
     return matrix;
 }
 
-EagleCanvas.prototype.mirrorLayer = function (layerIdx) {
+EagleCanvas.prototype.mirrorLayer = function(layerIdx) {
     if (layerIdx == 1) {
         return 16;
-    } else if (layerIdx == 16) {
+    }
+    else if (layerIdx == 16) {
         return 1;
     }
     var name = this.layersByNumber[layerIdx].name,
@@ -5787,7 +6667,8 @@ EagleCanvas.prototype.mirrorLayer = function (layerIdx) {
         if (mirrorLayer) {
             return mirrorLayer.number;
         }
-    } else if (prefix == 'b') {
+    }
+    else if (prefix == 'b') {
         var mirrorName = 't' + name.substring(1),
             mirrorLayer = this.eagleLayersByName[mirrorName];
         if (mirrorLayer) {
